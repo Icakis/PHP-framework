@@ -1,0 +1,7 @@
+
+<hr/>
+FOOTER
+</body>
+
+</html>
+
