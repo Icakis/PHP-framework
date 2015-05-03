@@ -1,17 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Icakis Nikus
- * Date: 2.5.2015 г.
- * Time: 14:13
- */
 
 namespace Lib;
 
-
 class notyMessage
 {
-
     //    Types:
 
     //'alert'
@@ -58,10 +50,9 @@ class notyMessage
         $this->modal = $modal;
     }
 
-
-        public function __toString()
-        {
-            return "
+    public function __toString()
+    {
+        return "
                 <script>
                 $(document).ready(function () {
                  var n =  noty({
@@ -75,5 +66,5 @@ class notyMessage
                                 })
                             });
                 </script>";
-        }
+    }
 } 

@@ -25,19 +25,15 @@ class TodosController extends BaseController
         parent::__construct(get_class(), 'todos', '/views/todos/');
         include_once 'models\todosModel.php';
         $this->model = new \Models\TodosModel();
-
     }
 
     public function index()
     {
         // $todos = $this->model->find(array('columns'=> array('user_id','id'),'limit'=>1));
-
         $this->items = $this->model->getTodoItems($_SESSION['user_id']);
         // var_dump($this->items);
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
-
-        // include_once DX_ROOT_DIR . '/views/layouts/' . $this->layout;
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
         $this->renderView($template_file);
@@ -60,7 +56,6 @@ class TodosController extends BaseController
 
     public function delete($delete_item_id)
     {
-
         try {
             $user_id = $_SESSION['user_id'];
             if(!$this->model->deleteTodoItem($user_id, $delete_item_id)){
@@ -68,6 +63,8 @@ class TodosController extends BaseController
             }
 
             array_push($_SESSION['messages'], new notyMessage('Item deleted.', 'success'));
+            header('Location: ' . DX_ROOT_URL . 'todos/index.php');
+            die;
         } catch (\Exception $e) {
             array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'error'));
         }

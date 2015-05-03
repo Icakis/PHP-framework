@@ -1,7 +1,7 @@
 <?php
 
-
 namespace Models;
+
 include_once 'baseModel.php';
 
 class TodosModel extends BaseModel

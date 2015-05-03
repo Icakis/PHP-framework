@@ -9,6 +9,7 @@ class BaseController
     protected $model = null;
     protected $controller = null;
     protected $logged_user = array();
+    protected $title = 'Home';
 
     public function __construct($controllerName = '\Controllers\BaseController', $model = 'todos', $views_dir = '/views/home/')
     {
@@ -37,7 +38,6 @@ class BaseController
     {
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
         var_dump($template_file);
-        die;
         $this->renderView($template_file);
     }
 
@@ -99,8 +99,11 @@ class BaseController
 
     protected function isAuthorize()
     {
-        session_start();
-        if (isset($_SESSION)&& $_SESSION['username'] && $_SESSION['user_id']) {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_SESSION) && isset($_SESSION['username']) && $_SESSION['username'] && isset($_SESSION['user_id'])) {
             // $this->logged_user = array('username' => $_SESSION['username'], 'user_id' => $_SESSION['id']);
             return true;
         }

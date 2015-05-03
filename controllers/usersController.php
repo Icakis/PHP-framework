@@ -9,7 +9,6 @@ class UsersController extends BaseController
     // protected $layout = 'default/default.php';
     protected $title;
 
-
     public function __construct()
     {
         parent::__construct(get_class(), 'users', 'views/users/');
@@ -21,7 +20,6 @@ class UsersController extends BaseController
     public function index()
     {
         $todos = $this->model->find(array('columns' => array('user_id', 'id'), 'limit' => 1));
-        // var_dump($todos);
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
 
@@ -39,6 +37,14 @@ class UsersController extends BaseController
         if (isset($_POST['user']) && isset($_POST['pass'])) {
             try {
                 $this->model->createUser($_POST['user'], $_POST['pass']);
+                $user_data = $this->model->isValidUser($_POST['user'], $_POST['pass']);
+                if(is_array($user_data)){
+                    $_SESSION['username'] = $user_data['username'];
+                    $_SESSION['user_id'] = $user_data['user_id'];
+                }else{
+                    throw new \Exception('Invalid username or password');
+                }
+
                 array_push($_SESSION['messages'], new notyMessage('User registered.', 'success'));
                 header('Location: ' . DX_ROOT_URL . 'todos/index.php');
                 exit();
