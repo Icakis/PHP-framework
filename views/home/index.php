@@ -1,2 +1,3 @@
+<h1>Todo Items</h1>
 <?php
-echo "HOME VIEW!";
+echo "TODOs Items!!";

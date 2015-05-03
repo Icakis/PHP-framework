@@ -43,7 +43,7 @@ class notyMessage
     protected $maxVisible;
     protected $modal;
 
-    public function __construct($text, $type = 'alert', $position = 'topCenter', $time = 10000, $closeWith = '[\'click\']', $maxVisible = 10, $modal = false)
+    public function __construct($text, $type = 'alert', $position = 'topCenter', $time = 10000, $closeWith = '[\'click\']', $maxVisible = 5, $modal = false)
     {
         if (!$text) {
             throw new \Exception('Message text is required.');

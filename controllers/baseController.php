@@ -9,7 +9,6 @@ class BaseController
     protected $model = null;
     protected $controller = null;
     protected $logged_user = array();
-    protected $messages = array();
 
     public function __construct($controllerName = '\Controllers\BaseController', $model = 'todos', $views_dir = '/views/home/')
     {
@@ -37,20 +36,22 @@ class BaseController
     public function home()
     {
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
-
-        include_once DX_ROOT_DIR . '/views/layouts/home' . $this->layout;
+        var_dump($template_file);
+        die;
+        $this->renderView($template_file);
     }
 
     public function index()
     {
-        var_dump(DX_ROOT_DIR);
-        var_dump(DX_ROOT_PATH);
-        var_dump(DX_ROOT_URL);
+//        var_dump(DX_ROOT_DIR);
+//        var_dump(DX_ROOT_PATH);
+//        var_dump(DX_ROOT_URL);
+
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
-        var_dump($template_file);
+        // var_dump($template_file);
 
-        include_once DX_ROOT_DIR . str_replace( 'views/layouts/home/', '/', DX_DS)  .  'index.php';
+        $this->renderView($template_file);
     }
 
     public function renderView($viewName = null, $includeLayout = true, $layoutName = null)
@@ -60,14 +61,14 @@ class BaseController
             $viewFileName = DX_ROOT_DIR . $this->views_dir . 'index.php';
         }
 
-       $viewFileName = $viewName;
+        $viewFileName = $viewName;
         // var_dump($viewFileName);
 
         if ($includeLayout === true) {
             if ($layoutName) {
-                $headerFile =DX_ROOT_DIR. 'views/layouts/' . $layoutName . '/header.php';
+                $headerFile = DX_ROOT_DIR . 'views/layouts/' . $layoutName . '/header.php';
             } else {
-                $headerFile = DX_ROOT_DIR.'views/layouts/' . $this->layout . '/header.php';
+                $headerFile = DX_ROOT_DIR . 'views/layouts/' . $this->layout . '/header.php';
             }
 
             include_once($headerFile);
@@ -77,12 +78,33 @@ class BaseController
 
         if ($includeLayout === true) {
             if ($layoutName) {
-                $footerFile = DX_ROOT_DIR.'views/layouts/' . $layoutName . '/footer.php';
+                $footerFile = DX_ROOT_DIR . 'views/layouts/' . $layoutName . '/footer.php';
             } else {
-                $footerFile = DX_ROOT_DIR.'views/layouts/' . $this->layout . '/footer.php';
+                $footerFile = DX_ROOT_DIR . 'views/layouts/' . $this->layout . '/footer.php';
             }
 
             include_once($footerFile);
         }
+    }
+
+    protected function isPost()
+    {
+        return $_SERVER['REQUEST_METHOD'] == 'POST';
+    }
+
+    protected function isGet()
+    {
+        return $_SERVER['REQUEST_METHOD'] == 'GET';
+    }
+
+    protected function isAuthorize()
+    {
+        session_start();
+        if (isset($_SESSION)&& $_SESSION['username'] && $_SESSION['user_id']) {
+            // $this->logged_user = array('username' => $_SESSION['username'], 'user_id' => $_SESSION['id']);
+            return true;
+        }
+
+        return false;
     }
 } 

@@ -1,13 +1,11 @@
 <?php
-session_start();
-$_SESSION['messages'] = array();
 include 'config/config.php';
-$rootDir = str_replace('\\', DX_DS,dirname(__FILE__));
+$rootDir = str_replace('\\', DX_DS, dirname(__FILE__));
 
 // Define root dir and root path
 define('DX_ROOT_DIR', $rootDir . DX_DS);
 define('DX_ROOT_PATH', basename(dirname(__FILE__)) . DX_DS);
-define('DX_ROOT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/cframe/');
+define('DX_ROOT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/Structuring-Web-Apps-Homework/');
 
 //var_dump(DX_ROOT_DIR);
 //var_dump(DX_ROOT_PATH);
@@ -29,7 +27,7 @@ $method = DEFAULT_ACTION;
 $admin_routing = false;
 $params = array();
 
-$baseControllerName= '\Controllers\\'.$controller.'Controller';
+$baseControllerName = '\Controllers\\' . $controller . 'Controller';
 
 if (!empty($request)) {
     if (strpos($request, $request_home) === 0) {
@@ -50,7 +48,7 @@ if (!empty($request)) {
         if (count($components) > 1) {
             list($controller, $method) = $components;
             $params = isset($components[2]) ? $components[2] : array();
-        }else{
+        } else {
             $baseController = new $baseControllerName();
             $baseController->index();
             exit;
