@@ -54,7 +54,7 @@ class BaseController
         $this->renderView($template_file);
     }
 
-    public function renderView($viewName = null, $includeLayout = true, $layoutName = null)
+    public function renderView($viewName = null, $data = null, $includeLayout = true, $layoutName = null)
     {
         // check render file
         if ($viewName == null) {

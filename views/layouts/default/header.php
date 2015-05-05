@@ -3,7 +3,10 @@
 <head>
     <script src=<?php echo '/' . DX_ROOT_PATH . "/js/jquery-2.1.3.js" ?>></script>
     <script src=<?php echo '/' . DX_ROOT_PATH . "/js/jquery.noty.packaged.js" ?>></script>
-
+    <link rel="stylesheet" src=<?php echo '/' . DX_ROOT_PATH . "/js/bootstrap-3.3.4-dist/dist/css/bootstrap.min.css"; ?> rel="stylesheet" >
+    <script type="text/javascript" src=<?php echo '/' . DX_ROOT_PATH . "/js/bootstrap-3.3.4-dist/js/bootstrap.min.js"; ?>></script>
+    <link href=<?php echo '/' . DX_ROOT_PATH . "/styles/bootstrap.min.css" ?> rel="stylesheet">
+    <link href=<?php echo '/' . DX_ROOT_PATH . "/styles/styles.css" ?> rel="stylesheet">
 
     <title><?php echo htmlspecialchars($this->title) ?></title>
     <?php
@@ -26,7 +29,7 @@
         if ($this->isAuthorize()) {
             ?>
             <li>User: <?php echo $_SESSION['username']; ?></li>
-            <li><a href=<?php echo DX_ROOT_URL . 'todos/index' ?>>Todos</a></li>
+            <li><a href=<?php echo DX_ROOT_URL . 'playlists/index' ?>>My Playlists</a></li>
             <li><a href=<?php echo DX_ROOT_URL . 'users/logout' ?>>Logout</a></li>
         <?php
         } else {

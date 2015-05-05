@@ -5,7 +5,7 @@ $rootDir = str_replace('\\', DX_DS, dirname(__FILE__));
 // Define root dir and root path
 define('DX_ROOT_DIR', $rootDir . DX_DS);
 define('DX_ROOT_PATH', basename(dirname(__FILE__)) . DX_DS);
-define('DX_ROOT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/Structuring-Web-Apps-Homework/');
+define('DX_ROOT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/PHP-Framework/');
 
 //var_dump(DX_ROOT_DIR);
 //var_dump(DX_ROOT_PATH);

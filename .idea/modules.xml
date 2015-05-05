@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Structuring-Web-Apps-Homework.iml" filepath="$PROJECT_DIR$/.idea/Structuring-Web-Apps-Homework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/PHP-Framework.iml" filepath="$PROJECT_DIR$/.idea/PHP-Framework.iml" />
     </modules>
   </component>
 </project>
