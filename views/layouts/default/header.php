@@ -35,11 +35,14 @@
         <?php
         } else {
             ?>
+
             <li><a href=<?php echo DX_ROOT_URL . 'users/register' ?>>Register</a></li>
             <li><a href=<?php echo DX_ROOT_URL . 'users/login' ?>>Login</a></li>
         <?php
         }
+
         ?>
+        <li><a href=<?php echo DX_ROOT_URL . 'genres/index' ?>>Genres</a></li>
     </ul>
 </header>
 <hr/>

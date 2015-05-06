@@ -16,7 +16,9 @@ class Database {
         $db = new \mysqli( $host, $username, $password, $database );
 
         // self::$db->set_charset("utf8");
+        $db->set_charset("utf8");
         self::$db = $db;
+
     }
 
     public static function get_instance() {

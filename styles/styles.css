@@ -2,3 +2,18 @@
     display: inline-block;
     width: 100%;
 }
+
+#genres-panel{
+    width: 35%;
+    display: inline-block;
+}
+
+
+#noteBulletId{
+ display: inline;
+    width: 25px;
+}
+
+.genre_li{
+    display: block;
+}
