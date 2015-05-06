@@ -35,7 +35,7 @@ class PlaylistsModel extends BaseModel
 
     public function getPlaylistsCount($user_id)
     {
-        $statement = $this->dbConnection->prepare("SELECT count(*) FROM playlists WHERE user_id = ?");
+        $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists WHERE user_id = ?");
         $statement->bind_param("i", $user_id);
         $statement->execute();
         $result_set = $statement->get_result();

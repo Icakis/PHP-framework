@@ -77,7 +77,11 @@ if (isset($controller) && file_exists('controllers/' . $controller . 'Controller
 
     // Call the object and the method
     if (method_exists($instance, $method)) {
-        call_user_func_array(array($instance, $method), array($params));
+        if (is_string($params)) {
+            $params = explode('/', $params);
+        }
+
+        call_user_func_array(array($instance, $method), $params);
         // $instance->$method();
     } else {
         // fallback to index

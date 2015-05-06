@@ -75,7 +75,7 @@ class UsersController extends BaseController
                 $this->setUserSessionData($user_data);
 
                 array_push($_SESSION['messages'], new notyMessage('Successful login', 'success'));
-                header('Location: ' . DX_ROOT_URL . 'playlists/index.php');
+                header('Location: ' . DX_ROOT_URL . 'playlists/index');
                 exit();
             } catch (\Exception $e) {
                 array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));

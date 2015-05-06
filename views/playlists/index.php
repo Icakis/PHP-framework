@@ -39,13 +39,25 @@ if (count($this->playlists) > 0) {
         <ul class="pagination">
             <?php
             if ($data['num_pages'] > 1) {
-                echo '<li><a href="#">First</a></li>';
+                ?>
+                <li>
+                    <a href=<?php echo DX_ROOT_URL . "playlists/index/{$data['items_per_page']}/1"; ?>>First</a>
+                </li>
+                <?php
 
-            for ($i = 0; $i < $data['num_pages']; $i++) {
-                $page_num = $i + 1;
-                echo "<li><a href=\"#\">$page_num</a></li>";
-            }
-                echo '<li><a href="#">First</a></li>';
+                for ($i = 0; $i < $data['num_pages']; $i++) {
+                    $page_num = $i + 1;
+                    ?>
+                    <li>
+                        <a href=<?php echo DX_ROOT_URL . "playlists/index/{$data['items_per_page']}/{$page_num}"; ?>><?php echo $page_num; ?></a>
+                    </li>
+                <?php
+                }
+                ?>
+                <li>
+                    <a href=<?php echo DX_ROOT_URL . "playlists/index/{$data['items_per_page']}/{$data['num_pages']}"; ?>>Last</a>
+                </li>
+            <?php
             }
             ?>
         </ul>
@@ -57,7 +69,7 @@ if (count($this->playlists) > 0) {
     <div class="panel panel-default" id="panel1">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-target="#collapseOne" href="#">
+                <a data-toggle="collapse" data-target="#collapseOne">
                     Create Playlist
                 </a>
             </h4>
