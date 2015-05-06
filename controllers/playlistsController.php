@@ -9,7 +9,12 @@ class PlaylistsController extends BaseController
     //protected $layout = 'default/default.php';
     protected $title = 'Playlists';
     protected $playlists;
-    protected $pageSize = PAGE_SIZE;
+
+    // required fields
+    protected $pageSize;
+    protected $contollerName = 'playlists';
+    protected $methodName;
+
     public function __construct()
     {
         if (!$this->isAuthorize()) {
@@ -22,61 +27,35 @@ class PlaylistsController extends BaseController
             die;
         }
 
-        parent::__construct(get_class(), 'playlists', '/views/playlists/');
-        include_once 'models\playlistsModel.php';
+        if (!isset($_SESSION['page_size'])) {
+            $this->pageSize = PAGE_SIZE;
+        } else {
+            $this->pageSize = $_SESSION['page_size'];
+        }
+
+        parent::__construct(get_class(), $this->contollerName, '/views/' . $this->contollerName . '/');
         $this->model = new \Models\PlaylistsModel();
+
+//        $modelsFileLocation = 'models\\' . $this->contollerName . 'Model.php';
+//        include_once $modelsFileLocation;
+//        $modelClass = '\Models\\' . ucfirst($this->contollerName) . 'Model';
+//        $this->model = new $modelClass();
     }
 
-    public function index($pageSize = PAGE_SIZE, $page = 1)
+    public function index($pageSize = '', $page = 1)
     {
-        $is_wrong_page_params = false;
-        if (!is_int($pageSize)) {
-            $pageSizeSting = $pageSize;
-            $pageSize = (int)$pageSize;
-            if ($pageSize <= 0 || $pageSize > 100 || strlen($pageSizeSting) != strlen($pageSize)) {
-                $pageSize = PAGE_SIZE;
-                $is_wrong_page_params = true;
-            }else{
-                $this->pageSize = $pageSize;
-            }
-        }
+        $this->methodName = __FUNCTION__;
+        $this->generatePaging($this->methodName , $pageSize, $page, $data);
 
-        $data['items_per_page'] = $pageSize;
-
-        if (!is_int($page)) {
-            $pageSting = $page;
-            $page = (int)$page;
-            if ($page <= 0 || strlen($pageSting) != strlen($page)) {
-                $page = 1;
-                $is_wrong_page_params = true;
-            }
-        }
-
-        $data['page'] = $page;
-
-        if ($is_wrong_page_params) {
-            header('Location: ' . DX_ROOT_URL . 'playlists/index/' . $data['items_per_page'].'/1');
-            die;
-        }
-
-
-        if ((isset($_POST['items_per_page']) && ((int)$_POST['items_per_page'] !== 0))) {
-            $data['items_per_page'] = (int)$_POST['items_per_page'];
-            header('Location: ' . DX_ROOT_URL . 'playlists/index/' . $data['items_per_page'].'/1');
-            die;
-        }
-
-
-        $items_count = $this->model->getPlaylistsCount($_SESSION['user_id']);
-        $data['num_pages'] = (int)ceil($items_count / $data['items_per_page']);
-        if ($data['page'] > $data['num_pages']) {
+        $items_count = $this->model->getUserPlaylistsCount($_SESSION['user_id']);
+        $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
+        if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
             $data['page'] = 1;
-            header('Location: ' . DX_ROOT_URL . 'playlists/index/'. $data['items_per_page'].'/1');
+            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1');
         }
 
-        $offset = $data['items_per_page'] * ($data['page'] - 1);
-        $this->playlists = $this->model->getPlaylists($_SESSION['user_id'], $offset, $data['items_per_page']);
-        // var_dump($this->items);
+        $offset = $this->pageSize * ($data['page'] - 1);
+        $this->playlists = $this->model->getUsersPlaylists($_SESSION['user_id'], $offset, $this->pageSize);
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
         $this->renderView($template_file, $data);
@@ -92,7 +71,8 @@ class PlaylistsController extends BaseController
             try {
                 $this->model->addPlaylist($user_id, $playlist_title, $playlist_description, isset($_POST['isPrivate']));
                 array_push($_SESSION['messages'], new notyMessage('Successful created playlist.', 'success'));
-                header('Location: ' . DX_ROOT_URL . 'playlists/index');
+                // var_dump($this->pageSize);
+                header('Location: ' . DX_ROOT_URL .$this->contollerName.'/index/' . $this->pageSize . '/1');
                 die;
             } catch (\Exception $e) {
                 array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
@@ -111,12 +91,72 @@ class PlaylistsController extends BaseController
             }
 
             array_push($_SESSION['messages'], new notyMessage('Playlist deleted.', 'success'));
-            header('Location: ' . DX_ROOT_URL . 'playlists/index');
+            header('Location: ' . DX_ROOT_URL . $this->contollerName.'/index');
             die;
         } catch (\Exception $e) {
             array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'error'));
         }
 
         $this->index();
+    }
+
+    public function all($pageSize = '', $page = 1)
+    {
+        $this->methodName = __FUNCTION__;
+        $this->generatePaging($this->methodName , $pageSize, $page, $data);
+
+        $offset = $this->pageSize * ($data['page'] - 1);
+        $this->playlists = $this->model->getAllPublicPlaylists( $offset, $this->pageSize);
+
+        $items_count = $this->model->getPublicPlaylistsCount();
+        $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
+        if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
+            $data['page'] = 1;
+            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1');
+        }
+
+        $template_file = DX_ROOT_DIR . $this->views_dir . 'all.php';
+        $this->renderView($template_file, $data);
+    }
+
+    protected function generatePaging($actionName, $pageSize, $page, &$data)
+    {
+        $is_wrong_page_params = false;
+        if (!is_int($pageSize)) {
+            $pageSizeSting = $pageSize;
+            $pageSize = (int)$pageSize;
+            if ($pageSize <= 0 || $pageSize > 100 || strlen($pageSizeSting) != strlen($pageSize)) {
+                $is_wrong_page_params = true;
+            } else {
+                $this->pageSize = $pageSize;
+                $_SESSION['page_size'] = $pageSize;
+            }
+        }
+
+        $data['items_per_page'] = $this->pageSize;
+
+        if (!is_int($page)) {
+            $pageSting = $page;
+            $page = (int)$page;
+            if ($page <= 0 || strlen($pageSting) != strlen($page)) {
+                $page = 1;
+                $is_wrong_page_params = true;
+            }
+        }
+
+        $data['page'] = $page;
+
+        if ($is_wrong_page_params) {
+            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $actionName . '/' . $this->pageSize . '/1');
+            die;
+        }
+
+
+        if ((isset($_POST['items_per_page']) && ((int)$_POST['items_per_page'] !== 0))) {
+            $data['items_per_page'] = (int)$_POST['items_per_page'];
+            $this->pageSize = (int)$_POST['items_per_page'];
+            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $actionName . '/' . $this->pageSize . '/1');
+            die;
+        }
     }
 } 

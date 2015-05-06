@@ -1,19 +1,10 @@
-<form method="post">
-    <label>Show on page:</label>
-    <select name='items_per_page' onchange='this.form.submit()'>
-        <option value="2" <?php if ($data['items_per_page'] === 2) echo 'selected'; ?>>2</option>
-        <option value="5" <?php if ($data['items_per_page'] === 5) echo 'selected'; ?>>5</option>
-        <option value="10" <?php if ($data['items_per_page'] === 10) echo 'selected'; ?>>10</option>
-        <option value="20" <?php if ($data['items_per_page'] === 20) echo 'selected'; ?>>20</option>
-        <option value="50" <?php if ($data['items_per_page'] === 50) echo 'selected'; ?>>50</option>
-        <option value="100" <?php if ($data['items_per_page'] === 100) echo 'selected'; ?>>100</option>
-    </select>
-    <noscript><input type="submit" value="Submit"></noscript>
-</form>
 
 <?php
+
+include_once DX_ROOT_DIR.'views/partials/select_page_size.php';
+
 if (count($this->playlists) > 0) {
-    var_dump($data);
+   // var_dump($data);
     ?>
     <ul>
         <?php
@@ -21,7 +12,7 @@ if (count($this->playlists) > 0) {
             ?>
             <li>
                 <?php echo $playlist['title'] ?> <a
-                    href=<?php echo DX_ROOT_URL . 'playlists/delete/' . $playlist['id'] ?>>Delete</a>
+                    href=<?php echo DX_ROOT_URL . $this->contollerName. '/delete/' . $playlist['id'] ?>>Delete</a>
             </li>
         <?php
         }
@@ -32,38 +23,9 @@ if (count($this->playlists) > 0) {
 } else {
     echo "<p>No playlists.</p>";
 }
+
+include_once DX_ROOT_DIR.'views/partials/paging.php';
 ?>
-
-<div class="row" id="paginationContainer" data-ng-controller="paginationController">
-    <div class="col-md-12">
-        <ul class="pagination">
-            <?php
-            if ($data['num_pages'] > 1) {
-                ?>
-                <li>
-                    <a href=<?php echo DX_ROOT_URL . "playlists/index/{$data['items_per_page']}/1"; ?>>First</a>
-                </li>
-                <?php
-
-                for ($i = 0; $i < $data['num_pages']; $i++) {
-                    $page_num = $i + 1;
-                    ?>
-                    <li>
-                        <a href=<?php echo DX_ROOT_URL . "playlists/index/{$data['items_per_page']}/{$page_num}"; ?>><?php echo $page_num; ?></a>
-                    </li>
-                <?php
-                }
-                ?>
-                <li>
-                    <a href=<?php echo DX_ROOT_URL . "playlists/index/{$data['items_per_page']}/{$data['num_pages']}"; ?>>Last</a>
-                </li>
-            <?php
-            }
-            ?>
-        </ul>
-    </div>
-</div>
-
 
 <div class="panel-group" id="accordion">
     <div class="panel panel-default" id="panel1">
@@ -74,7 +36,7 @@ if (count($this->playlists) > 0) {
                 </a>
             </h4>
         </div>
-        <div id="collapseOne" class="panel-collapse collapse in">
+        <div id="collapseOne" class="panel-collapse collapse">
             <div class="panel-body">
                 <form method="post" action=<?php echo DX_ROOT_URL . 'playlists/add' ?>>
                     <div class="row">

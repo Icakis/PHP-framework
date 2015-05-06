@@ -30,6 +30,7 @@
             ?>
             <li>User: <?php echo $_SESSION['username']; ?></li>
             <li><a href=<?php echo DX_ROOT_URL . 'playlists/index' ?>>My Playlists</a></li>
+            <li><a href=<?php echo DX_ROOT_URL . 'playlists/all' ?>>Public Playlists</a></li>
             <li><a href=<?php echo DX_ROOT_URL . 'users/logout' ?>>Logout</a></li>
         <?php
         } else {

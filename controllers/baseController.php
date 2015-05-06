@@ -8,7 +8,6 @@ class BaseController
     protected $views_dir = 'views/home/';
     protected $model = null;
     protected $controller = null;
-    protected $logged_user = array();
     protected $title = 'Home';
 
     public function __construct($controllerName = '\Controllers\BaseController', $model = 'todos', $views_dir = '/views/home/')
@@ -37,7 +36,7 @@ class BaseController
     public function home()
     {
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
-        var_dump($template_file);
+        // var_dump($template_file);
         $this->renderView($template_file);
     }
 

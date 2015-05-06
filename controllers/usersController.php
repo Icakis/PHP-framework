@@ -133,7 +133,5 @@ class UsersController extends BaseController
         } catch (\Exception $e) {
             array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
         }
-
-
     }
 } 
