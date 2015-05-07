@@ -9,7 +9,7 @@
 
                 ?>
                 <li>
-                    <a href=<?php echo DX_ROOT_URL . $this->contollerName.'/'.$this->methodName ."/{$this->pageSize}/1/{$data['filter']}"; ?>>First</a>
+                    <a href=<?php echo DX_ROOT_URL . $this->controllerName.'/'.$this->methodName ."/{$this->pageSize}/1/{$data['filter']}"; ?>>First</a>
                 </li>
                 <?php
 
@@ -17,13 +17,13 @@
                     $page_num = $i + 1;
                     ?>
                     <li <?php if ($page_num == $data['page']) echo "class='active'" ?>>
-                        <a href=<?php echo DX_ROOT_URL . $this->contollerName.'/'.$this->methodName ."/{$this->pageSize}/{$page_num}/{$data['filter']}"; ?>><?php echo $page_num; ?></a>
+                        <a href=<?php echo DX_ROOT_URL . $this->controllerName.'/'.$this->methodName ."/{$this->pageSize}/{$page_num}/{$data['filter']}"; ?>><?php echo $page_num; ?></a>
                     </li>
                 <?php
                 }
                 ?>
                 <li>
-                    <a href=<?php echo DX_ROOT_URL .$this->contollerName.'/'.$this->methodName ."/{$this->pageSize}/{$data['num_pages']}/{$data['filter']}"; ?>>Last</a>
+                    <a href=<?php echo DX_ROOT_URL .$this->controllerName.'/'.$this->methodName ."/{$this->pageSize}/{$data['num_pages']}/{$data['filter']}"; ?>>Last</a>
                 </li>
             <?php
             }

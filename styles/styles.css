@@ -54,3 +54,45 @@
     border: 0.2em solid lightblue;
     border-radius: 1.5em;
 }
+.createCommentForm{
+    margin-left: 5%;
+    text-align: center;
+}
+.playlistCommentItem{
+    padding: 0.5em;
+    background-color: aliceblue;
+    display: block;
+    vertical-align: middle;
+    list-style-type: none;
+    margin: 1.5em 2em;
+    border: 0.2em solid lightblue;
+    border-radius: 0.5em;
+}
+.playlistCommentItem >div >a{
+    font-size: 1.5em;
+    font-style: italic;
+}
+.playlistCommentUL{
+    list-style-type: none;
+    margin:0;
+    padding: 0;
+}
+.playlistCommentItem  time{
+    position: relative;
+    left: 3em;
+    font-size: 0.7em;
+    font-style: italic;
+}
+
+#commentInput{
+    display: inline-block;
+    margin-left: 2.5%;
+    padding: 0.5em;
+    width: 90%;
+}
+
+.noComment{
+    text-align: center;
+    font-style: oblique;
+    font-size: 1.2em;
+}

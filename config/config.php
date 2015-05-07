@@ -17,3 +17,6 @@ define('PAGE_SIZE', 5);
 // default songs location
 define('SONGS_SRC_DIR', 'content/songs/');
 
+// default time format
+define('TIME_FORMAT', 'd M Y H:i:s');
+

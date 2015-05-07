@@ -4,15 +4,15 @@ namespace Controllers;
 
 use Lib\notyMessage;
 
-class SongsController extends BaseController
+class PlaylistcommentsController extends BaseController
 {
     //protected $layout = 'default/default.php';
-    protected $title = 'Songs';
-    protected $songs;
+    protected $title = 'Playlist Comments';
+    protected $comments;
 
     // required fields
     protected $pageSize;
-    protected $controllerName = 'songs';
+    protected $controllerName = 'playlistcomments';
     protected $methodName;
 
     public function __construct()
@@ -34,7 +34,7 @@ class SongsController extends BaseController
         }
 
         parent::__construct(get_class(), $this->controllerName, '/views/' . $this->controllerName . '/');
-        $this->model = new \Models\SongsModel();
+        $this->model = new \Models\PlaylistCommentsModel();
 
 //        $modelsFileLocation = 'models\\' . $this->contollerName . 'Model.php';
 //        include_once $modelsFileLocation;
@@ -42,31 +42,38 @@ class SongsController extends BaseController
 //        $this->model = new $modelClass();
     }
 
-    public function index($playlist_id, $pageSize = '', $page = 1)
+    public function index($pageSize = '', $page = 1, $filter = null)
     {
-        $this->methodName = __FUNCTION__.'/'.$playlist_id ;
+        $this->show($pageSize, $page, $filter);
+    }
 
-        $playlist_id_string = $playlist_id;
-        $playlist_id = (int)$playlist_id;
-        if(!isset($playlist_id) || strlen($playlist_id_string) != strlen($playlist_id) ){
-            array_push($_SESSION['messages'], new notyMessage('Error getting playlist id.', 'error'));
-            header('Location: ' . DX_ROOT_URL .'playlists/index/' . $this->pageSize . '/1');
+    public function show($playlist_id, $pageSize = null, $page = 1, $filter = null)
+    {
+        $this->methodName = __FUNCTION__.'/'.$playlist_id;
+        if ($filter) {
+            $filter = urldecode($filter);
         }
 
-        $this->generatePaging($this->methodName, $pageSize, $page, $data);
+        $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
+        if (isset($_POST['search'])) {
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
+            die;
+        }
 
-        $items_count = $this->model->getPlaylistSongsCount($playlist_id);
+        $items_count = $this->model->getPlaylistCommentsCount($playlist_id, $filter);
+        $data['items_count'] = $items_count;
         $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
+        $data['filter'] = $filter;
         if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
             $data['page'] = 1;
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . $this->pageSize . '/1');
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1');
         }
 
         $offset = $this->pageSize * ($data['page'] - 1);
-        $this->songs = $this->model->getPlaylistSongs($playlist_id, $offset, $this->pageSize);
 
-        $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
-        $this->renderView($template_file, $data);
+        $data['playlist_comments'] = $this->model->getPlaylistComments($playlist_id, $offset, $this->pageSize, $filter);
+        $template_file = DX_ROOT_DIR . $this->views_dir . 'show.php';
+        $this->renderView($template_file, $data, false);
     }
 
     public function add()
@@ -80,14 +87,14 @@ class SongsController extends BaseController
                 $this->model->addPlaylist($user_id, $playlist_title, $playlist_description, isset($_POST['isPrivate']));
                 array_push($_SESSION['messages'], new notyMessage('Successful created playlist.', 'success'));
                 // var_dump($this->pageSize);
-                header('Location: ' . DX_ROOT_URL .$this->contollerName.'/index/' . $this->pageSize . '/1');
+                header('Location: ' . DX_ROOT_URL . $this->controllerName . '/mine/' . $this->pageSize . '/1');
                 die;
             } catch (\Exception $e) {
                 array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
             }
         }
 
-       // $this->index();
+        $this->index();
     }
 
     public function delete($delete_playlist_id)
@@ -99,33 +106,44 @@ class SongsController extends BaseController
             }
 
             array_push($_SESSION['messages'], new notyMessage('Playlist deleted.', 'success'));
-            header('Location: ' . DX_ROOT_URL . $this->contollerName.'/index');
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/mine');
             die;
         } catch (\Exception $e) {
             array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'error'));
         }
 
-      //  $this->index();
+        $this->index();
     }
 
-    public function all($pageSize = '', $page = 1)
+    public function all($pageSize = '', $page = 1, $filter = null)
     {
         $this->methodName = __FUNCTION__;
-        $this->generatePaging($this->methodName , $pageSize, $page, $data);
 
-        $offset = $this->pageSize * ($data['page'] - 1);
-        $this->playlists = $this->model->getAllPublicPlaylists( $offset, $this->pageSize);
+        if ($filter) {
+            $filter = urldecode($filter);
+        }
 
-        $items_count = $this->model->getPublicPlaylistsCount();
+        $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
+
+        if (isset($_POST['search'])) {
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
+            die;
+        }
+
+
+        $items_count = $this->model->getPublicPlaylistsCount($filter);
+        $data['items_count'] = $items_count;
         $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
+        $data['filter'] = $filter;
         if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
             $data['page'] = 1;
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1');
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . $filter);
         }
+
+        $offset = $this->pageSize * ($data['page'] - 1);
+        $data['playlists'] = $this->model->getAllPublicPlaylists($offset, $this->pageSize, $filter);
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'all.php';
         $this->renderView($template_file, $data);
     }
-
-
 } 

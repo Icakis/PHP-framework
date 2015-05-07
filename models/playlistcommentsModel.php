@@ -4,11 +4,11 @@ namespace Models;
 
 include_once 'baseModel.php';
 
-class PlaylistsModel extends BaseModel
+class PlaylistCommentsModel extends BaseModel
 {
     public function __construct($args = array())
     {
-        $args['table'] = 'playlists';
+        $args['table'] = 'playlists_comments';
         parent::__construct($args);
     }
 
@@ -36,14 +36,16 @@ class PlaylistsModel extends BaseModel
         return $results;
     }
 
-    public function getAllPublicPlaylists($offset, $playlists_count, $filter = null)
+    public function getPlaylistComments($playlist_id, $offset, $comments_count, $filter = null)
     {
         if ($filter) {
-            $statement = $this->dbConnection->prepare("SELECT *, playlist.id as playlist_id FROM playlists JOIN users ON playlists.user_id=users.id WHERE is_private = false AND title LIKE CONCAT('%', ?, '%') limit ?, ? ");
-            $statement->bind_param("sii", $filter, $offset, $playlists_count);
+            $statement = $this->dbConnection->prepare(
+                "SELECT * FROM playlists_comments JOIN users ON playlists_comments.user_id = users.id WHERE  playlist_id = ? AND text LIKE CONCAT('%', ?, '%') limit ?, ? ");
+            $statement->bind_param("isii", $playlist_id, $filter, $offset, $comments_count);
         } else {
-            $statement = $this->dbConnection->prepare("SELECT *, playlists.id as playlist_id FROM playlists JOIN users ON playlists.user_id=users.id WHERE is_private = false limit ?, ? ");
-            $statement->bind_param("ii", $offset, $playlists_count);
+            $statement = $this->dbConnection->prepare(
+                "SELECT * FROM playlists_comments JOIN users ON playlists_comments.user_id = users.id WHERE  playlist_id = ? limit ?, ?");
+            $statement->bind_param("iii", $playlist_id, $offset, $comments_count);
         }
 
         $statement->execute();
@@ -60,16 +62,15 @@ class PlaylistsModel extends BaseModel
         return $results;
     }
 
-    public function getUserPlaylistsCount($user_id, $filter = null)
+    public function getPlaylistCommentsCount($playlist_id, $filter = null)
     {
         if ($filter) {
-            $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists WHERE user_id = ? AND  title LIKE CONCAT('%', ?, '%')");
-            $statement->bind_param("is", $user_id, $filter);
+            $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists_comments WHERE  playlist_id = ? AND text LIKE CONCAT('%', ?, '%')");
+            $statement->bind_param("isii", $playlist_id, $filter);
         } else {
-            $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists WHERE user_id = ?");
-            $statement->bind_param("i", $user_id);
+            $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists_comments WHERE  playlist_id = ?");
+            $statement->bind_param("i", $playlist_id);
         }
-
 
         $statement->execute();
         $result_set = $statement->get_result();

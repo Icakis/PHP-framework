@@ -1,45 +1,6 @@
-<div class="panel-group" id="accordion">
-    <div class="panel panel-default" id="panel1">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a data-toggle="collapse" data-target="#collapseOne">
-                    Create Playlist
-                </a>
-            </h4>
-        </div>
-        <div id="collapseOne" class="panel-collapse collapse">
-            <div class="panel-body">
-                <form method="post" action=<?php echo DX_ROOT_URL . 'playlists/add' ?>>
-                    <div class="row">
-                        <div class="col-md-2">
-                            <img id="defaultPlaylistImageId"
-                                 src=<?php echo DX_ROOT_URL . 'content/images/playlist/default.png' ?>>
-                        </div>
-                        <div class="col-md-10">
-                            <div>
-                                <label for="titleInput">Title:</label>
-                                <input name="title" type="text" id="titleInput" required="required"/>
-                            </div>
-                            <div>
-                                <label for="descriptionInput">Description:</label>
-                                <textarea id="descriptionInput" name="description"></textarea>
-                            </div>
-                            <div>
-                                <label for="isPrivateInput">Private:</label>
-                                <input type="checkbox" id="isPrivateInput" name="isPrivate" value="1"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="buttonContainer">
-                        <input type="submit" class="btn btn-default btn-lg" value="Create playlist"/>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 <?php
+include_once DX_ROOT_DIR . 'views/playlists/create.php';
 include_once DX_ROOT_DIR . 'views/partials/select_page_size.php';
 include_once DX_ROOT_DIR . 'views/partials/filter_by_text.php';
 
@@ -116,11 +77,11 @@ if (count($data['playlists']) > 0) {
                 <div class="col-md-2">
                     <div class="row playlistActionContainer"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>Actions</div>
                     <div class="row">
-                        <a href=<?php echo DX_ROOT_URL . $this->contollerName . '/delete/' . $playlist['id'] ?>>
+                        <a href=<?php echo DX_ROOT_URL . $this->controllerName . '/delete/' . $playlist['id'] ?>>
                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete</a>
                     </div>
                     <div class="row">
-                        <a href=<?php echo DX_ROOT_URL . $this->contollerName . '/edit/' . $playlist['id'] ?>>
+                        <a href=<?php echo DX_ROOT_URL . $this->controllerName . '/edit/' . $playlist['id'] ?>>
                             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>Edit</a>
                     </div>
                 </div>
