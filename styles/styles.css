@@ -17,3 +17,7 @@
 .genre_li{
     display: block;
 }
+
+#pageSizeFormId, #searchFormId{
+    display: inline-block;
+}

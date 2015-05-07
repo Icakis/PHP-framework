@@ -11,4 +11,9 @@ define('DB_USERNAME', 'root');
 define('DB_PASSWORD', '');
 define('DB_NAME', 'php_framework');
 
+// default Items per page
 define('PAGE_SIZE', 5);
+
+// default songs location
+define('SONGS_SRC_DIR', 'content/songs/');
+

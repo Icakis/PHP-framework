@@ -19,7 +19,7 @@
                 }
                 ?>
                 <li>
-                    <a href=<?php echo DX_ROOT_URL .$this->contollerName.'/'.$this->methodName ."/{$data['num_pages']}"; ?>>Last</a>
+                    <a href=<?php echo DX_ROOT_URL .$this->contollerName.'/'.$this->methodName ."/{$this->pageSize}/{$data['num_pages']}"; ?>>Last</a>
                 </li>
             <?php
             }

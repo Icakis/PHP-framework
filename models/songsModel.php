@@ -4,27 +4,18 @@ namespace Models;
 
 include_once 'baseModel.php';
 
-class PlaylistsModel extends BaseModel
+class SongsModel extends BaseModel
 {
-    protected $title;
-
     public function __construct($args = array())
     {
-        $args['table'] = 'playlists';
+        $args['table'] = 'songs';
         parent::__construct($args);
-        $this->title = 'Users';
     }
 
-    public function getUsersPlaylists($user_id, $offset, $playlists_count, $filter = null)
+    public function getUsersPlaylists($user_id, $offset, $playlists_count)
     {
-        if ($filter) {
-            $statement = $this->dbConnection->prepare("SELECT * FROM playlists WHERE user_id = ? AND title LIKE CONCAT('%', ?, '%') limit ?, ?");
-            $statement->bind_param("isii", $user_id, $filter, $offset, $playlists_count);
-        } else {
-            $statement = $this->dbConnection->prepare("SELECT * FROM playlists WHERE user_id = ? limit ?, ?");
-            $statement->bind_param("iii", $user_id, $offset, $playlists_count);
-        }
-
+        $statement = $this->dbConnection->prepare("SELECT * FROM playlists WHERE user_id = ? limit ?, ?");
+        $statement->bind_param("iii", $user_id, $offset, $playlists_count);
         $statement->execute();
         $result_set = $statement->get_result();
 
@@ -39,16 +30,10 @@ class PlaylistsModel extends BaseModel
         return $results;
     }
 
-    public function getAllPublicPlaylists($offset, $playlists_count, $filter = null)
+    public function getPlaylistSongs($playlist_id, $offset, $playlists_count)
     {
-        if ($filter) {
-            $statement = $this->dbConnection->prepare("SELECT * FROM playlists JOIN users ON playlists.user_id=users.id WHERE is_private = false AND title LIKE CONCAT('%', ?, '%') limit ?, ? ");
-            $statement->bind_param("sii", $filter, $offset, $playlists_count);
-        } else {
-            $statement = $this->dbConnection->prepare("SELECT * FROM playlists JOIN users ON playlists.user_id=users.id WHERE is_private = false limit ?, ? ");
-            $statement->bind_param("ii", $offset, $playlists_count);
-        }
-
+        $statement = $this->dbConnection->prepare("SELECT * FROM songs WHERE playlist_id = ? limit ?, ? ");
+        $statement->bind_param("iii", $playlist_id, $offset, $playlists_count);
         $statement->execute();
         $result_set = $statement->get_result();
 
@@ -63,17 +48,10 @@ class PlaylistsModel extends BaseModel
         return $results;
     }
 
-    public function getUserPlaylistsCount($user_id, $filter = null)
+    public function getPlaylistSongsCount($playlist_id)
     {
-        if ($filter) {
-            $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists WHERE user_id = ? AND  title LIKE CONCAT('%', ?, '%')");
-            $statement->bind_param("is", $user_id, $filter);
-        } else {
-            $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists WHERE user_id = ?");
-            $statement->bind_param("i", $user_id);
-        }
-
-
+        $statement = $this->dbConnection->prepare("SELECT count(id) FROM songs WHERE playlist_id = ?");
+        $statement->bind_param("i", $playlist_id);
         $statement->execute();
         $result_set = $statement->get_result();
 
@@ -84,15 +62,29 @@ class PlaylistsModel extends BaseModel
         return $result_set->fetch_row()[0];
     }
 
-    public function getPublicPlaylistsCount($filter = null)
+
+    public function getAllPublicPlaylists($offset, $playlists_count)
     {
-        if ($filter) {
-            $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists WHERE is_private = false AND title LIKE CONCAT('%', ?, '%')");
-            $statement->bind_param("s", $filter);
-        } else {
-            $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists WHERE is_private = false");
+        $statement = $this->dbConnection->prepare("SELECT * FROM playlists JOIN users ON playlists.user_id=users.id WHERE is_private = false limit ?, ? ");
+        $statement->bind_param("ii", $offset, $playlists_count);
+        $statement->execute();
+        $result_set = $statement->get_result();
+
+        $results = array();
+
+        if (!empty($result_set) && $result_set->num_rows > 0) {
+            while ($row = $result_set->fetch_assoc()) {
+                $results[] = $row;
+            }
         }
 
+        return $results;
+    }
+
+
+    public function getPublicPlaylistsCount()
+    {
+        $statement = $this->dbConnection->prepare("SELECT count(id) FROM playlists WHERE is_private = false");
         $statement->execute();
         $result_set = $statement->get_result();
 
@@ -129,7 +121,7 @@ class PlaylistsModel extends BaseModel
             throw new \Exception('Invalid user id.');
         }
 
-        $playlist_id = (int)$playlist_id;
+        $playlist_id =(int)$playlist_id;
         $statement = $this->dbConnection->prepare("DELETE FROM playlists WHERE id = ? and user_id = ?");
         $statement->bind_param("ii", $playlist_id, $user_id);
         $statement->execute();

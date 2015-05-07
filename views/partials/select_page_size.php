@@ -1,4 +1,4 @@
-<form method="post">
+<form method="post" id="pageSizeFormId">
     <label>Show on page:</label>
     <select name='items_per_page' onchange='this.form.submit()'>
         <option value="2" <?php if ($this->pageSize === 2) echo 'selected'; ?>>2</option>

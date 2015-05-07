@@ -1,32 +1,3 @@
-
-<?php
-
-include_once DX_ROOT_DIR.'views/partials/select_page_size.php';
-
-if (count($this->playlists) > 0) {
-   // var_dump($data);
-    ?>
-    <ul>
-        <?php
-        foreach ($this->playlists as $playlist) {
-            ?>
-            <li>
-                <?php echo $playlist['title'] ?> <a
-                    href=<?php echo DX_ROOT_URL . $this->contollerName. '/delete/' . $playlist['id'] ?>>Delete</a>
-            </li>
-        <?php
-        }
-        ?>
-    </ul>
-
-<?php
-} else {
-    echo "<p>No playlists.</p>";
-}
-
-include_once DX_ROOT_DIR.'views/partials/paging.php';
-?>
-
 <div class="panel-group" id="accordion">
     <div class="panel panel-default" id="panel1">
         <div class="panel-heading">
@@ -67,3 +38,34 @@ include_once DX_ROOT_DIR.'views/partials/paging.php';
         </div>
     </div>
 </div>
+
+
+<?php
+
+include_once DX_ROOT_DIR.'views/partials/select_page_size.php';
+include_once DX_ROOT_DIR.'views/partials/filter_by_text.php';
+
+if (count($data['playlists']) > 0) {
+   // var_dump($data);
+    ?>
+    <ul>
+        <?php
+        foreach ($data['playlists'] as $playlist) {
+            ?>
+            <li>
+                <a href=<?php echo DX_ROOT_URL .'songs/index/' . $playlist['id'] ?>><?php echo $playlist['title'] ?></a>
+                <a href=<?php echo DX_ROOT_URL . $this->contollerName. '/delete/' . $playlist['id'] ?>>Delete</a>
+            </li>
+        <?php
+        }
+        ?>
+    </ul>
+
+<?php
+} else {
+    echo "<p>No playlists.</p>";
+}
+
+include_once DX_ROOT_DIR.'views/partials/paging.php';
+?>
+
