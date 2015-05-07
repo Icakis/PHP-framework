@@ -21,3 +21,36 @@
 #pageSizeFormId, #searchFormId{
     display: inline-block;
 }
+
+.playlistImageClass{
+    display: block;
+    width: 100%;
+}
+
+.likesCountContainer, .playlistActionContainer{
+    vertical-align: middle;
+    font-size: 2em;
+}
+.likesBalanceContainer{
+    vertical-align: middle;
+    font-size: 1em;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+.cleanStyleButton {
+    border:0;
+    background-color: transparent;
+}
+
+.playlistItem{
+    display: inline-block;
+    vertical-align: middle;
+    list-style-type: none;
+    margin: 0.5em 0;
+    border: 0.2em solid lightblue;
+    border-radius: 1.5em;
+}

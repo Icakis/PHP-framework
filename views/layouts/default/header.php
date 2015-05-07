@@ -3,7 +3,7 @@
 <head>
     <script src=<?php echo '/' . DX_ROOT_PATH . "/js/jquery-2.1.3.js" ?>></script>
     <script src=<?php echo '/' . DX_ROOT_PATH . "/js/jquery.noty.packaged.js" ?>></script>
-    <link rel="stylesheet" src=<?php echo '/' . DX_ROOT_PATH . "/js/bootstrap-3.3.4-dist/dist/css/bootstrap.min.css"; ?> rel="stylesheet" >
+    <link rel="stylesheet" href=<?php echo '/' . DX_ROOT_PATH . "/js/bootstrap-3.3.4-dist/css/bootstrap.min.css"; ?> rel="stylesheet" >
     <script type="text/javascript" src=<?php echo '/' . DX_ROOT_PATH . "/js/bootstrap-3.3.4-dist/js/bootstrap.min.js"; ?>></script>
     <link href=<?php echo '/' . DX_ROOT_PATH . "/styles/bootstrap.min.css" ?> rel="stylesheet">
     <link href=<?php echo '/' . DX_ROOT_PATH . "/styles/styles.css" ?> rel="stylesheet">

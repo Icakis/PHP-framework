@@ -52,11 +52,12 @@ class PlaylistsController extends BaseController
         $this->methodName = __FUNCTION__;
         $this->generatePaging($this->methodName, $pageSize, $page, $data);
         if (isset($_POST['search'])) {
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
+            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . $_POST['search']);
             die;
         }
 
         $items_count = $this->model->getUserPlaylistsCount($_SESSION['user_id'], $filter);
+        $data['items_count'] = $items_count;
         $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
         if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
             $data['page'] = 1;
@@ -65,7 +66,6 @@ class PlaylistsController extends BaseController
 
         $offset = $this->pageSize * ($data['page'] - 1);
 
-        // $this->playlists = $this->model->getUsersPlaylists($_SESSION['user_id'], $offset, $this->pageSize);
         $data['playlists'] = $this->model->getUsersPlaylists($_SESSION['user_id'], $offset, $this->pageSize, $filter);
         $template_file = DX_ROOT_DIR . $this->views_dir . 'mine.php';
         $this->renderView($template_file, $data);
@@ -112,21 +112,28 @@ class PlaylistsController extends BaseController
 
     public function all($pageSize = '', $page = 1, $filter = null)
     {
-        $this->methodName = __FUNCTION__;
-        $this->generatePaging($this->methodName, $pageSize, $page, $data);
-        if($filter){
-            $filter = urlencode($filter);
+         $this->methodName = __FUNCTION__;
+
+        if ($filter) {
+            $filter = urldecode($filter);
         }
+
+        $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
+
         if (isset($_POST['search'])) {
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
+            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' .urlencode($_POST['search']) );
             die;
         }
 
+
+
         $items_count = $this->model->getPublicPlaylistsCount($filter);
+        $data['items_count'] = $items_count;
         $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
+        $data['filter'] = $filter;
         if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
             $data['page'] = 1;
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1');
+            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . $filter);
         }
 
         $offset = $this->pageSize * ($data['page'] - 1);
@@ -134,5 +141,5 @@ class PlaylistsController extends BaseController
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'all.php';
         $this->renderView($template_file, $data);
-    }
+     }
 } 

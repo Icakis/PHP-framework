@@ -110,7 +110,7 @@ class BaseController
         return false;
     }
 
-    protected  function generatePaging($actionName, $pageSize, $page, &$data)
+    protected function generatePaging($actionName, $pageSize, $page, &$data, $filter = null)
     {
         $is_wrong_page_params = false;
         if (!is_int($pageSize)) {
@@ -138,7 +138,7 @@ class BaseController
         $data['page'] = $page;
 
         if ($is_wrong_page_params) {
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $actionName . '/' . $this->pageSize . '/1');
+            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $actionName . '/' . $this->pageSize . '/1/'.urlencode($filter));
             die;
         }
 
@@ -146,7 +146,7 @@ class BaseController
         if ((isset($_POST['items_per_page']) && ((int)$_POST['items_per_page'] !== 0))) {
             $data['items_per_page'] = (int)$_POST['items_per_page'];
             $this->pageSize = (int)$_POST['items_per_page'];
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $actionName . '/' . $this->pageSize . '/1');
+            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $actionName . '/' . $this->pageSize . '/1/'.urlencode($filter));
             die;
         }
     }
