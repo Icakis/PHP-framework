@@ -1,4 +1,4 @@
-<h1>Todo Items</h1>
+<h1>Music is ...</h1>
 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
 <?php
-echo "TODOs Items!!";
+include DX_ROOT_DIR.'views/layouts/default/default.php';

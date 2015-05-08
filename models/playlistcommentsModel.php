@@ -101,18 +101,22 @@ class PlaylistCommentsModel extends BaseModel
         return $result_set->fetch_row()[0];
     }
 
-    public function addPlaylist($user_id, $title, $description, $is_private)
+    public function addPlaylistComment($playlist_id, $user_id, $comment)
     {
-        if ($title == '') {
-            throw new \Exception('Cannot create Playlist with empty title.');
+        if ($comment == '') {
+            throw new \Exception('Cannot create empty playlist comment.');
         }
 
-        if ($user_id == '') {
+        if ($playlist_id == '' || !is_int($playlist_id)) {
+            throw new \Exception('Invalid playlist id.');
+        }
+
+        if ($user_id == '' || !is_int($user_id)) {
             throw new \Exception('Invalid user id.');
         }
 
-        $statement = $this->dbConnection->prepare("INSERT INTO playlists (user_id, title, date_created, description, is_private) VALUES(?, ?, ?, ?, ?)");
-        $statement->bind_param("issss", $user_id, $title, date("c"), $description, $is_private);
+        $statement = $this->dbConnection->prepare("INSERT INTO playlists_comments (playlist_id, user_id, text, date_created) VALUES(?, ?, ?, ?)");
+        $statement->bind_param("iiss", $playlist_id, $user_id, $comment, date("c"));
         $statement->execute();
         return $statement->affected_rows > 0;
     }

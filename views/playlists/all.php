@@ -1,14 +1,44 @@
 <script>
     function loadComments(el) {
+        var defaultText = 'Show Comments';
+        if ($(el).text() == defaultText) {
+
+            $(el).text('Hide Comments');
+        } else {
+            $(el).text(defaultText);
+        }
+        ;
         var container = $($(el).attr('data-target'))[0];
         var playlistId = $(container).attr('data-playlist-id');
-        console.log(playlistId);
+//        console.log(playlistId);
 //        console.log(container);
         $.ajax({
             url: '<?php echo DX_ROOT_URL ?>playlistcomments/show/' + playlistId,
             method: 'get'
         }).success(function (data) {
             $(container).html(data);
+        });
+
+    }
+
+    function addComment(el) {
+        var commentText = $($(el))[0].getElementsByTagName('textarea')[0].value;
+
+//        var container = $($(el).parent().attr('data-target'))[0];
+//        var playlistId = $(container).attr('data-playlist-id');
+        var playlistId = $(el).parent().attr('data-playlist-id');
+//        console.log(container);
+
+        $.ajax({
+            url: '<?php echo DX_ROOT_URL ?>playlistcomments/add/' + playlistId,
+            method: 'post',
+            data: {"text": commentText}
+        }).success(function (data) {
+            commentText ='';
+
+           return false;
+        }).error(function () {
+            return false
         });
 
     }

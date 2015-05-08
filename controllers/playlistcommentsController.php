@@ -76,25 +76,24 @@ class PlaylistcommentsController extends BaseController
         $this->renderView($template_file, $data, false);
     }
 
-    public function add()
+    public function add($playlist_id)
     {
         if ($this->isPost()) {
             $user_id = $_SESSION['user_id'];
-            $playlist_title = $_POST['title'];
-            $playlist_description = $_POST['description'];
+            $comment = $_POST['text'];
 
             try {
-                $this->model->addPlaylist($user_id, $playlist_title, $playlist_description, isset($_POST['isPrivate']));
-                array_push($_SESSION['messages'], new notyMessage('Successful created playlist.', 'success'));
-                // var_dump($this->pageSize);
-                header('Location: ' . DX_ROOT_URL . $this->controllerName . '/mine/' . $this->pageSize . '/1');
+                $playlist_id = (int)$playlist_id;
+                $this->model->addPlaylistComment($playlist_id, $user_id, $comment);
+                array_push($_SESSION['messages'], new notyMessage('Successful comment added.', 'success'));
+                header('Location: ' . DX_ROOT_URL . $this->controllerName . '/playlists/' . $this->pageSize . '/1');
                 die;
             } catch (\Exception $e) {
                 array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
             }
         }
 
-        $this->index();
+//        $this->index();
     }
 
     public function delete($delete_playlist_id)
