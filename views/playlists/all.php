@@ -2,22 +2,23 @@
     function loadComments(el) {
         var defaultText = 'Show Comments';
         if ($(el).text() == defaultText) {
+            var container = $($(el).attr('data-target'))[0];
+            var playlistId = $(container).attr('data-playlist-id');
+//        console.log(playlistId);
+//        console.log(container);
+            $.ajax({
+                url: '<?php echo DX_ROOT_URL ?>playlistcomments/show/' + playlistId,
+                method: 'get'
+            }).success(function (data) {
+                $(container).html(data);
+            });
 
             $(el).text('Hide Comments');
         } else {
             $(el).text(defaultText);
         }
         ;
-        var container = $($(el).attr('data-target'))[0];
-        var playlistId = $(container).attr('data-playlist-id');
-//        console.log(playlistId);
-//        console.log(container);
-        $.ajax({
-            url: '<?php echo DX_ROOT_URL ?>playlistcomments/show/' + playlistId,
-            method: 'get'
-        }).success(function (data) {
-            $(container).html(data);
-        });
+
 
     }
 

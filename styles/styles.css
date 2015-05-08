@@ -1,3 +1,11 @@
+.row{
+    margin-left: 1%;
+
+}
+.col-md-4{
+    width: 33%;
+}
+
 #defaultPlaylistImageId{
     display: inline-block;
     width: 100%;
@@ -95,4 +103,21 @@
     text-align: center;
     font-style: oblique;
     font-size: 1.2em;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.playerContainer{
+    display: block;
+    padding: 3%;
+}
+.player{
+    width: 100%;
+}
+
+.playlistTitleHeading{
+    text-align: center;
 }

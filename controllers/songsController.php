@@ -42,9 +42,12 @@ class SongsController extends BaseController
 //        $this->model = new $modelClass();
     }
 
-    public function index($playlist_id, $pageSize = '', $page = 1)
+    public function index($playlist_id, $pageSize = '', $page = 1, $filter = null)
     {
         $this->methodName = __FUNCTION__.'/'.$playlist_id ;
+        if ($filter) {
+            $filter = urldecode($filter);
+        }
 
         $playlist_id_string = $playlist_id;
         $playlist_id = (int)$playlist_id;
@@ -54,8 +57,12 @@ class SongsController extends BaseController
         }
 
         $this->generatePaging($this->methodName, $pageSize, $page, $data);
+        if (isset($_POST['search'])) {
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' .urlencode($_POST['search']) );
+            die;
+        }
 
-        $items_count = $this->model->getPlaylistSongsCount($playlist_id);
+        $items_count = $this->model->getPlaylistSongsCount($playlist_id, $filter);
         $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
         if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
             $data['page'] = 1;
@@ -63,7 +70,7 @@ class SongsController extends BaseController
         }
 
         $offset = $this->pageSize * ($data['page'] - 1);
-        $this->songs = $this->model->getPlaylistSongs($playlist_id, $offset, $this->pageSize);
+        $data['songs'] = $this->model->getPlaylistSongs($playlist_id, $offset, $this->pageSize, $filter);
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
         $this->renderView($template_file, $data);
