@@ -45,18 +45,20 @@
     }
 </script>
 <?php
-
+// TODO if its users playlist show upload.php
+include_once DX_ROOT_DIR . 'views/songs/upload.php';
 include_once DX_ROOT_DIR . 'views/partials/select_page_size.php';
 $data['search_placeholder']='search in songs names ...';
 include_once DX_ROOT_DIR . 'views/partials/filter_by_text.php';
 
-echo "<h2 class='playlistTitleHeading'>{$data['songs'][0]['playlist_title']}</h2>";
+
 if (isset($data['items_count'])) {
     echo "<div>Founded songs: <span>{$data['items_count']}</span></div>";
 }
 
 if (count($data['songs']) > 0) {
     // var_dump($data);
+    echo "<h2 class='playlistTitleHeading'>{$data['songs'][0]['playlist_title']}</h2>";
     ?>
     <ul>
         <?php
@@ -85,14 +87,14 @@ if (count($data['songs']) > 0) {
                             <h4>Album: <?php echo $song['song_album']; ?></h4>
                         </div>
                         <?php
-                        if($song['genre_name']){
+                        if(isset($song['genre_name']) && $song['genre_name']){
                             ?>
                             <div class="row">
                                 <h4>Album: <?php echo $song['genre_name']; ?></h4>
                             </div>
                         <?php
                         }
-                        if($song['genre_type_name']){
+                        if(isset($song['genre_name']) && $song['genre_type_name']){
                             ?>
                             <div class="row">
                                 <h4>Album: <?php echo $song['genre_type_name']; ?></h4>

@@ -15,10 +15,20 @@ class PlaylistCommentsModel extends BaseModel
     public function getUsersPlaylists($user_id, $offset, $playlists_count, $filter = null)
     {
         if ($filter) {
-            $statement = $this->dbConnection->prepare("SELECT * FROM playlists WHERE user_id = ? AND title LIKE CONCAT('%', ?, '%') limit ?, ?");
+            $statement = $this->dbConnection->prepare(
+                "SELECT *
+                FROM playlists
+                WHERE user_id = ? AND title LIKE CONCAT('%', ?, '%')
+                ORDER BY sc.date_created ASC
+                LIMIT ?, ?");
             $statement->bind_param("isii", $user_id, $filter, $offset, $playlists_count);
         } else {
-            $statement = $this->dbConnection->prepare("SELECT * FROM playlists WHERE user_id = ? limit ?, ?");
+            $statement = $this->dbConnection->prepare(
+                "SELECT *
+                FROM playlists
+                WHERE user_id = ?
+                ORDER BY sc.date_created ASC
+                LIMIT ?, ?");
             $statement->bind_param("iii", $user_id, $offset, $playlists_count);
         }
 
@@ -115,7 +125,9 @@ class PlaylistCommentsModel extends BaseModel
             throw new \Exception('Invalid user id.');
         }
 
-        $statement = $this->dbConnection->prepare("INSERT INTO playlists_comments (playlist_id, user_id, text, date_created) VALUES(?, ?, ?, ?)");
+        $statement = $this->dbConnection->prepare(
+            "INSERT INTO playlists_comments (playlist_id, user_id, text, date_created)
+            VALUES(?, ?, ?, ?)");
         $statement->bind_param("iiss", $playlist_id, $user_id, $comment, date("c"));
         $statement->execute();
         return $statement->affected_rows > 0;
@@ -132,7 +144,9 @@ class PlaylistCommentsModel extends BaseModel
         }
 
         $playlist_id = (int)$playlist_id;
-        $statement = $this->dbConnection->prepare("DELETE FROM playlists WHERE id = ? and user_id = ?");
+        $statement = $this->dbConnection->prepare(
+            "DELETE FROM playlists
+            WHERE id = ? and user_id = ?");
         $statement->bind_param("ii", $playlist_id, $user_id);
         $statement->execute();
         return $statement->affected_rows > 0;

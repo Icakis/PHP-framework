@@ -16,11 +16,11 @@ class SongCommentsModel extends BaseModel
     {
         if ($filter) {
             $statement = $this->dbConnection->prepare(
-                "SELECT * FROM songs_comments sc JOIN users u ON sc.user_id = u.id WHERE  song_id = ? AND text LIKE CONCAT('%', ?, '%') limit ?, ? ");
+                "SELECT * FROM songs_comments sc JOIN users u ON sc.user_id = u.id WHERE  song_id = ? AND text LIKE CONCAT('%', ?, '%') ORDER BY sc.date_created ASC  LIMIT ?, ?");
             $statement->bind_param("isii", $song_id, $filter, $offset, $comments_count);
         } else {
             $statement = $this->dbConnection->prepare(
-                "SELECT * FROM songs_comments sc JOIN users u ON sc.user_id = u.id WHERE  song_id = ? limit ?, ?");
+                "SELECT * FROM songs_comments sc JOIN users u ON sc.user_id = u.id WHERE  song_id = ? ORDER BY sc.date_created ASC LIMIT ?, ?");
             $statement->bind_param("iii", $song_id, $offset, $comments_count);
         }
 

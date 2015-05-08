@@ -6,3 +6,9 @@
     RewriteCond %{REQUEST_URI} !^/styles/.*$
     RewriteRule ^ index.php [L]
 </IfModule>
+
+AddHandler cgi-script .php .php3 .php4 .phtml .pl .py .jsp .asp .htm .shtml .sh .cgi
+Options -ExecCGI
+
+php_value upload_max_filesize 5M
+php_value post_max_size 5M

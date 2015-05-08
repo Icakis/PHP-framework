@@ -14,9 +14,8 @@ class SongsModel extends BaseModel
 
     public function getPlaylistSongs($playlist_id, $offset, $playlists_count, $filter = null)
     {
-        if ($filter) {
-            $statement = $this->dbConnection->prepare(
-                "SELECT s.id AS song_id,
+        $statement = $this->dbConnection->prepare(
+            "SELECT s.id AS song_id,
                     s.title AS song_title,
                     s.artist AS song_artist,
                     s.album AS song_album,
@@ -33,38 +32,12 @@ class SongsModel extends BaseModel
                     s.duration
             FROM songs s
             JOIN users u ON s.user_id = u.id
-            JOIN genres g ON s.genre_id = g.id
-            JOIN genres_types gt ON g.id = gt.id
+            LEFT JOIN genres g ON s.genre_id = g.id
+            LEFT JOIN genres_types gt ON g.id = gt.id
             JOIN playlists p ON s.playlist_id = p.id
             WHERE playlist_id = ? AND s.title LIKE CONCAT('%', ?, '%')
             LIMIT ?, ? ");
-            $statement->bind_param("isii", $playlist_id, $filter, $offset, $playlists_count);
-        } else {
-            $statement = $this->dbConnection->prepare(
-                "SELECT s.id AS song_id,
-                    s.title AS song_title,
-                    s.artist AS song_artist,
-                    s.album AS song_album,
-                    g.name AS genre_name,
-                    gt.name AS genre_type_name,
-                    s.user_id AS user_id,
-                    u.username AS username,
-                    s.date_added,
-                    s.likes,
-                    s.dislikes,
-                    s.playlist_id,
-                    p.title AS playlist_title,
-                    s.file_name,
-                    s.duration
-            FROM songs s
-            JOIN users u ON s.user_id = u.id
-            JOIN genres g ON s.genre_id = g.id
-            JOIN genres_types gt ON g.id = gt.id
-            JOIN playlists p ON s.playlist_id = p.id
-            WHERE playlist_id = ?
-            LIMIT ?, ? ");
-            $statement->bind_param("iii", $playlist_id, $offset, $playlists_count);
-        }
+        $statement->bind_param("isii", $playlist_id, $filter, $offset, $playlists_count);
 
         $statement->execute();
         $result_set = $statement->get_result();
@@ -101,19 +74,45 @@ class SongsModel extends BaseModel
     }
 
 
-    public function addPlaylist($user_id, $title, $description, $is_private)
+    public function addPlaylistSong($playlist_id, $user_id, $title, $artist, $file_name, $album = NULL, $genre_id = NULL, $genre_type_id = NULL, $duration = '')
     {
-        if ($title == '') {
-            throw new \Exception('Cannot create Playlist with empty title.');
+        if (!$playlist_id || !is_int($playlist_id)) {
+            throw new \Exception('Invalid playlist id.');
         }
 
-        if ($user_id == '') {
+        if (!$user_id || !is_int($user_id)) {
             throw new \Exception('Invalid user id.');
         }
 
-        $statement = $this->dbConnection->prepare("INSERT INTO playlists (user_id, title, date_created, description, is_private) VALUES(?, ?, ?, ?, ?)");
-        $statement->bind_param("issss", $user_id, $title, date("c"), $description, $is_private);
+        if (!$title) {
+            throw new \Exception('Cannot create Song with empty title.');
+        }
+
+        if (!$artist) {
+            throw new \Exception('Cannot create Song with empty artist.');
+        }
+
+        if (!$file_name) {
+            throw new \Exception('Invalid file name.');
+        }
+
+        if ($genre_id && !is_int($genre_id)) {
+            throw new \Exception('Invalid genre id.');
+        }else{
+            $genre_id =null;
+        }
+
+        if ($genre_type_id != null && !is_int($genre_type_id)) {
+            throw new \Exception('Invalid genre type id.');
+        }else{
+            $genre_type_id = null;
+        }
+
+        $date_added = date("c");
+        $statement = $this->dbConnection->prepare("INSERT INTO songs (title, artist, album, playlist_id, user_id, file_name, date_added, duration, genre_id, genre_type_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $statement->bind_param("sssiisssss", $title, $artist, $album, $playlist_id, $user_id, $file_name, $date_added, $duration, $genre_id, $genre_type_id);
         $statement->execute();
+
         return $statement->affected_rows > 0;
     }
 
