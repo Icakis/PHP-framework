@@ -41,24 +41,45 @@ class RanksController extends BaseController
         $this->mine($pageSize, $page, $filter);
     }
 
-    public function rankplaylist($playlist_id, $pageSize = '', $page = 1, $filter = null)
+    public function rankplaylist($playlist_id, $is_like, $pageSize = '', $page = 1, $filter = null)
     {
-        $this->methodName = __FUNCTION__;
-
         if($this->isPost()){
+            try {
+                if ($is_like != '-1' && $is_like != '1') {
 
+                    throw new \Exception('Invalid vote vaule');
+                }
+
+                if (strlen((int)$playlist_id) != strlen( $playlist_id )) {
+
+                    throw new \Exception('Invalid playlist id');
+                }
+
+
+                $is_like = (int) $is_like;
+                if($is_like === 1){
+                    $is_like = true;
+                }else{
+                    $is_like = false;
+                }
+
+                $playlist_id = (int)$playlist_id;
+
+                $this->model->rankPlaylist($playlist_id, $_SESSION['user_id'], $is_like);
+            } catch (\Exception $e) {
+                array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
+                die;
+            }
+
+
+            if($is_like){
+                $message ='Succesfully like playlist';
+            }else{
+                $message ='Succesfully dislike playlist';
+            }
+
+            array_push($_SESSION['messages'], new notyMessage($message, 'success'));
         }
-
-
-        if (isset($_POST['search'])) {
-            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' .urlencode($_POST['search']) );
-            die;
-        }
-
-
-        $data['playlists'] = $this->model->getUsersPlaylists($_SESSION['user_id'], $offset, $this->pageSize, $filter);
-        $template_file = DX_ROOT_DIR . $this->views_dir . 'mine.php';
-        $this->renderView($template_file, $data);
     }
 
     public function getplaylistrank($playlist_id)
@@ -67,7 +88,7 @@ class RanksController extends BaseController
             $user_id = $_SESSION['user_id'];
 
             try {
-                return  $this->model->getPlaylistLikesDislikes($playlist_id);
+                return $this->model->getPlaylistLikesDislikes($playlist_id);
             } catch (\Exception $e) {
                 array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
             }
@@ -94,7 +115,7 @@ class RanksController extends BaseController
 
     public function all($pageSize = '', $page = 1, $filter = null)
     {
-         $this->methodName = __FUNCTION__;
+        $this->methodName = __FUNCTION__;
 
         if ($filter) {
             $filter = urldecode($filter);
@@ -103,10 +124,9 @@ class RanksController extends BaseController
         $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
 
         if (isset($_POST['search'])) {
-            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' .urlencode($_POST['search']) );
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
             die;
         }
-
 
 
         $items_count = $this->model->getPublicPlaylistsCount($filter);
@@ -123,9 +143,10 @@ class RanksController extends BaseController
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'all.php';
         $this->renderView($template_file, $data);
-     }
+    }
 
-    public function  isUserPlaylist($playlist_id, $user_id){
+    public function  isUserPlaylist($playlist_id, $user_id)
+    {
         try {
             $user_id = $_SESSION['user_id'];
             return $this->isUserPlaylist($playlist_id, $user_id);

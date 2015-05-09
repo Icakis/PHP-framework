@@ -4,6 +4,8 @@ namespace Controllers;
 
 use Lib\notyMessage;
 
+include_once '/models/ranksModel.php';
+
 class PlaylistsController extends BaseController
 {
     //protected $layout = 'default/default.php';
@@ -14,6 +16,7 @@ class PlaylistsController extends BaseController
     protected $pageSize;
     protected $controllerName = 'playlists';
     protected $methodName;
+    protected $rank_model;
 
     public function __construct()
     {
@@ -35,11 +38,7 @@ class PlaylistsController extends BaseController
 
         parent::__construct(get_class(), $this->controllerName, '/views/' . $this->controllerName . '/');
         $this->model = new \Models\PlaylistsModel();
-
-//        $modelsFileLocation = 'models\\' . $this->controllerName . 'Model.php';
-//        include_once $modelsFileLocation;
-//        $modelClass = '\Models\\' . ucfirst($this->controllerName) . 'Model';
-//        $this->model = new $modelClass();
+        $this->rank_model = new \Models\RanksModel();
     }
 
     public function index($pageSize = '', $page = 1, $filter = null)
@@ -56,14 +55,14 @@ class PlaylistsController extends BaseController
 
         $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
         if (isset($_POST['search'])) {
-            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' .urlencode($_POST['search']) );
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
             die;
         }
 
         $items_count = $this->model->getUserPlaylistsCount($_SESSION['user_id'], $filter);
         $data['items_count'] = $items_count;
         $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
-        $data['filter'] =$filter;
+        $data['filter'] = $filter;
         if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
             $data['page'] = 1;
             header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1');
@@ -72,6 +71,10 @@ class PlaylistsController extends BaseController
         $offset = $this->pageSize * ($data['page'] - 1);
 
         $data['playlists'] = $this->model->getUsersPlaylists($_SESSION['user_id'], $offset, $this->pageSize, $filter);
+        foreach ($data['playlists'] as $k=>$v) {
+            $data['playlists'][ $k]['rank_stats'] = $this->rank_model->isPlaylistLikedByUser($v['playlist_id'], $_SESSION['user_id']);
+        }
+
         $template_file = DX_ROOT_DIR . $this->views_dir . 'mine.php';
         $this->renderView($template_file, $data);
     }
@@ -117,7 +120,7 @@ class PlaylistsController extends BaseController
 
     public function all($pageSize = '', $page = 1, $filter = null)
     {
-         $this->methodName = __FUNCTION__;
+        $this->methodName = __FUNCTION__;
 
         if ($filter) {
             $filter = urldecode($filter);
@@ -126,10 +129,9 @@ class PlaylistsController extends BaseController
         $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
 
         if (isset($_POST['search'])) {
-            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' .urlencode($_POST['search']) );
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
             die;
         }
-
 
 
         $items_count = $this->model->getPublicPlaylistsCount($filter);
@@ -143,12 +145,15 @@ class PlaylistsController extends BaseController
 
         $offset = $this->pageSize * ($data['page'] - 1);
         $data['playlists'] = $this->model->getAllPublicPlaylists($offset, $this->pageSize, $filter);
-
+        foreach ($data['playlists'] as $k=>$v) {
+            $data['playlists'][ $k]['rank_stats'] = $this->rank_model->isPlaylistLikedByUser($v['playlist_id'], $_SESSION['user_id']);
+        }
         $template_file = DX_ROOT_DIR . $this->views_dir . 'all.php';
         $this->renderView($template_file, $data);
-     }
+    }
 
-    public function  isUserPlaylist($playlist_id, $user_id){
+    public function  isUserPlaylist($playlist_id, $user_id)
+    {
         try {
             $user_id = $_SESSION['user_id'];
             return $this->isUserPlaylist($playlist_id, $user_id);

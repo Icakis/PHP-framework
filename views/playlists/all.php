@@ -16,7 +16,8 @@
             $(el).text('Hide Comments');
         } else {
             $(el).text(defaultText);
-        } ;
+        }
+        ;
     }
 
     function addComment(el) {
@@ -32,12 +33,27 @@
             method: 'post',
             data: {"text": commentText}
         }).success(function (data) {
-            commentText ='';
+            commentText = '';
 
-           return false;
+            return false;
         }).error(function () {
             return false
         });
+    }
+
+    function vote(el) {
+        playlist_id = $(el).data('playlist-id');
+        rank_value = $(el).find('input[name="vote-value"]').val();
+        $.ajax({
+            url: '<?php echo DX_ROOT_URL ?>ranks/rankplaylist/' + playlist_id + '/' + rank_value,
+            method: 'post'
+        }).success(function (data) {
+           return location.reload();
+        }).error(function(e){
+            console.log(e);
+        });
+
+        return false;
     }
 </script>
 
@@ -98,20 +114,35 @@ if (count($data['playlists']) > 0) {
                         <div class="row vertical-align">
                             <div class="col-md-4">
                                 <div class="row ">
-                                    <form method="post">
-                                        <input type="hidden" name="like" value="1">
-                                        <button type="submit" class="cleanStyleButton" disabled><span
-                                                class="glyphicon glyphicon-thumbs-up" style="color:blue"
-                                                aria-hidden="true"></span>
+                                    <form method="post" onsubmit="return vote(this)"
+                                          data-playlist-id=<?php echo $playlist['playlist_id']; ?>>
+                                        <input type="hidden" name="vote-value" value="1">
+                                        <button type="submit" class="cleanStyleButton"
+                                            <?php
+                                            $is_liked = !$this->isAuthorize() || (isset($playlist['rank_stats']) && $playlist['rank_stats']['is_like']);
+                                            if ($is_liked) {
+                                                echo "disabled='disabled'";
+                                            }
+                                            ?>><span class="glyphicon glyphicon-thumbs-up<?php if ($is_liked) {
+                                                echo " liked";
+                                            } ?>" aria-hidden="true"></span>
                                         </button>
                                         <?php echo $playlist['likes_sum']; ?>
                                     </form>
                                 </div>
                                 <div class="row">
-                                    <form method="post">
-                                        <input type="hidden" name="dislike" value="-1">
-                                        <button type="submit" class="cleanStyleButton"><span
-                                                class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+                                    <form method="post" onsubmit="return vote(this)"
+                                          data-playlist-id=<?php echo $playlist['playlist_id']; ?>>
+                                        <input type="hidden" name="vote-value" value="-1">
+                                        <button type="submit" class="cleanStyleButton"
+                                            <?php
+                                            $is_disliked = !$this->isAuthorize() || (isset($playlist['rank_stats']) && $playlist['rank_stats']['is_dislike']);
+                                            if ($is_disliked) {
+                                                echo "disabled='disabled'";
+                                            }
+                                            ?>><span class="glyphicon glyphicon-thumbs-down<?php if ($is_disliked) {
+                                                echo " disliked";
+                                            } ?>" aria-hidden="true"></span>
                                         </button>
                                         <?php echo $playlist['dislikes_sum']; ?>
                                     </form>

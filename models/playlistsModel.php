@@ -22,9 +22,7 @@ class PlaylistsModel extends BaseModel
                 FROM php_framework.playlists p
                 JOIN users
                   ON p.user_id = users.id
-                LEFT JOIN (
-                SELECT
-                            playlist_id as pid,
+                LEFT JOIN (SELECT playlist_id as pid,
                             SUM(is_like) as likes_sum,
                             SUM(is_dislike) as dislikes_sum
                         FROM php_framework.users_playlist_ranks
