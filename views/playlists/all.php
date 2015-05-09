@@ -104,7 +104,7 @@ if (count($data['playlists']) > 0) {
                                                 class="glyphicon glyphicon-thumbs-up" style="color:blue"
                                                 aria-hidden="true"></span>
                                         </button>
-                                        <?php echo $playlist['likes']; ?>
+                                        <?php echo $playlist['likes_sum']; ?>
                                     </form>
                                 </div>
                                 <div class="row">
@@ -113,14 +113,14 @@ if (count($data['playlists']) > 0) {
                                         <button type="submit" class="cleanStyleButton"><span
                                                 class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
                                         </button>
-                                        <?php echo $playlist['dislikes']; ?>
+                                        <?php echo $playlist['dislikes_sum']; ?>
                                     </form>
                                 </div>
                             </div>
                             <div class="col-md-4 vertical-align">
                                 <div class="row likesBalanceContainer">
                                     <span class="glyphicon glyphicon-heart"
-                                          aria-hidden="true"></span><?php echo($playlist['likes'] - $playlist['dislikes']); ?>
+                                          aria-hidden="true"></span><?php echo($playlist['likes_sum'] - $playlist['dislikes_sum']); ?>
                                 </div>
                             </div>
                             <div class="col-md-4 vertical-align">

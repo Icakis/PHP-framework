@@ -15,10 +15,44 @@ class PlaylistsModel extends BaseModel
     public function getUsersPlaylists($user_id, $offset, $playlists_count, $filter = null)
     {
         if ($filter) {
-            $statement = $this->dbConnection->prepare("SELECT * FROM playlists WHERE user_id = ? AND title LIKE CONCAT('%', ?, '%') limit ?, ?");
+            $statement = $this->dbConnection->prepare(
+                "SELECT *, p.id AS playlist_id,
+                    likes_info.likes_sum AS likes_sum,
+                    likes_info.dislikes_sum AS dislikes_sum
+                FROM php_framework.playlists p
+                JOIN users
+                  ON p.user_id = users.id
+                LEFT JOIN (
+                SELECT
+                            playlist_id as pid,
+                            SUM(is_like) as likes_sum,
+                            SUM(is_dislike) as dislikes_sum
+                        FROM php_framework.users_playlist_ranks
+                        GROUP BY playlist_id
+                        ) likes_info
+                ON  likes_info.pid = p.id
+                WHERE user_id = ? AND title
+                LIKE CONCAT('%', ?, '%') limit ?, ?");
             $statement->bind_param("isii", $user_id, $filter, $offset, $playlists_count);
         } else {
-            $statement = $this->dbConnection->prepare("SELECT * FROM playlists WHERE user_id = ? limit ?, ?");
+            $statement = $this->dbConnection->prepare(
+                "SELECT *, p.id AS playlist_id,
+                    likes_info.likes_sum AS likes_sum,
+                    likes_info.dislikes_sum AS dislikes_sum
+                FROM php_framework.playlists p
+                JOIN users
+                  ON p.user_id = users.id
+                LEFT JOIN (
+                SELECT
+                            playlist_id as pid,
+                            SUM(is_like) as likes_sum,
+                            SUM(is_dislike) as dislikes_sum
+                        FROM php_framework.users_playlist_ranks
+                        GROUP BY playlist_id
+                        ) likes_info
+                ON  likes_info.pid = p.id
+                WHERE user_id = ?
+                LIMIT ?, ?");
             $statement->bind_param("iii", $user_id, $offset, $playlists_count);
         }
 
@@ -40,15 +74,43 @@ class PlaylistsModel extends BaseModel
     {
         if ($filter) {
             $statement = $this->dbConnection->prepare(
-                "SELECT *, playlist.id as playlist_id
-                FROM playlists
-                JOIN users ON playlists.user_id=users.id
-                WHERE is_private = false AND title
-                LIKE CONCAT('%', ?, '%')
+                "SELECT *, p.id AS playlist_id,
+                    likes_info.likes_sum AS likes_sum,
+                    likes_info.dislikes_sum AS dislikes_sum
+                FROM php_framework.playlists p
+                JOIN users
+                  ON p.user_id = users.id
+                LEFT JOIN (
+                        SELECT
+                            playlist_id as pid,
+                            SUM(is_like) as likes_sum,
+                            SUM(is_dislike) as dislikes_sum
+                        FROM php_framework.users_playlist_ranks
+                        GROUP BY playlist_id
+                        ) likes_info
+                ON  likes_info.pid = p.id
+                WHERE is_private = false AND title LIKE CONCAT('%', ?, '%')
                 LIMIT ?, ? ");
             $statement->bind_param("sii", $filter, $offset, $playlists_count);
         } else {
-            $statement = $this->dbConnection->prepare("SELECT *, playlists.id as playlist_id FROM playlists JOIN users ON playlists.user_id=users.id WHERE is_private = false limit ?, ? ");
+            $statement = $this->dbConnection->prepare(
+                "SELECT *, p.id AS playlist_id,
+                    likes_info.likes_sum AS likes_sum,
+                    likes_info.dislikes_sum AS dislikes_sum
+                FROM php_framework.playlists p
+                JOIN users
+                  ON p.user_id = users.id
+                LEFT JOIN (
+                        SELECT
+                            playlist_id as pid,
+                            SUM(is_like) as likes_sum,
+                            SUM(is_dislike) as dislikes_sum
+                        FROM php_framework.users_playlist_ranks
+                        GROUP BY playlist_id
+                        ) likes_info
+                ON  likes_info.pid = p.id
+                WHERE is_private = false
+                LIMIT ?, ? ");
             $statement->bind_param("ii", $offset, $playlists_count);
         }
 
