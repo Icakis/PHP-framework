@@ -89,23 +89,14 @@ class GenresController extends BaseController
         $this->index();
     }
 
-    public function all($pageSize = '', $page = 1)
+    public function allGenres($pageSize = '', $page = 1)
     {
-        $this->methodName = __FUNCTION__;
-        $this->generatePaging($this->methodName , $pageSize, $page, $data);
-
-        $offset = $this->pageSize * ($data['page'] - 1);
-        $this->playlists = $this->model->getAllPublicPlaylists( $offset, $this->pageSize);
-
-        $items_count = $this->model->getPublicPlaylistsCount();
-        $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
-        if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
-            $data['page'] = 1;
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $this->methodName . '/' . $this->pageSize . '/1');
+        $this->genres = $this->model->getGenres();
+        foreach($this->genres as  $key => $value){
+            $this->genres[$key]['genres_types']= $this->model->getGenreTypesByGenreType($value['id']);
         }
 
-        $template_file = DX_ROOT_DIR . $this->views_dir . 'all.php';
-        $this->renderView($template_file, $data);
+       echo json_encode($this->genres);
     }
 
     protected function generatePaging($actionName, $pageSize, $page, &$data)

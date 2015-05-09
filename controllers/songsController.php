@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Lib\notyMessage;
+use \Models\PlaylistsModel;
 
 class SongsController extends BaseController
 {
@@ -58,6 +59,9 @@ class SongsController extends BaseController
         }
 
         $this->playlist_id = $playlist_id;
+        include_once DX_ROOT_DIR. 'models/playlistsModel.php';
+        $playlist_model = new \Models\PlaylistsModel();
+        $data['is_users_playlist'] = $playlist_model->isUserPlaylist($playlist_id, $_SESSION['user_id']);
 
         $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
         if (isset($_POST['search'])) {

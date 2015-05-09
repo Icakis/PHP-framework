@@ -31,7 +31,7 @@
                             <div>
                                 <label for="genreSelect">Genre:</label>
                                 <select name='genre_id' id="genreSelect">
-                                    <option value="">Unknown genre</option>
+                                    <option value="">-</option>
                                     <?php
                                     foreach($data['genres'] as $genre){
                                         echo "<option value={$genre['id']}>{$genre['name']}</option>";

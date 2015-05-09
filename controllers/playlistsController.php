@@ -147,4 +147,13 @@ class PlaylistsController extends BaseController
         $template_file = DX_ROOT_DIR . $this->views_dir . 'all.php';
         $this->renderView($template_file, $data);
      }
+
+    public function  isUserPlaylist($playlist_id, $user_id){
+        try {
+            $user_id = $_SESSION['user_id'];
+            return $this->isUserPlaylist($playlist_id, $user_id);
+        } catch (\Exception $e) {
+            array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'error'));
+        }
+    }
 } 

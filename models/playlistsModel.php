@@ -39,7 +39,13 @@ class PlaylistsModel extends BaseModel
     public function getAllPublicPlaylists($offset, $playlists_count, $filter = null)
     {
         if ($filter) {
-            $statement = $this->dbConnection->prepare("SELECT *, playlist.id as playlist_id FROM playlists JOIN users ON playlists.user_id=users.id WHERE is_private = false AND title LIKE CONCAT('%', ?, '%') limit ?, ? ");
+            $statement = $this->dbConnection->prepare(
+                "SELECT *, playlist.id as playlist_id
+                FROM playlists
+                JOIN users ON playlists.user_id=users.id
+                WHERE is_private = false AND title
+                LIKE CONCAT('%', ?, '%')
+                LIMIT ?, ? ");
             $statement->bind_param("sii", $filter, $offset, $playlists_count);
         } else {
             $statement = $this->dbConnection->prepare("SELECT *, playlists.id as playlist_id FROM playlists JOIN users ON playlists.user_id=users.id WHERE is_private = false limit ?, ? ");
@@ -131,5 +137,30 @@ class PlaylistsModel extends BaseModel
         $statement->bind_param("ii", $playlist_id, $user_id);
         $statement->execute();
         return $statement->affected_rows > 0;
+    }
+
+    public function isUserPlaylist($playlist_id, $user_id)
+    {
+        if(!$playlist_id || !is_int($playlist_id)){
+            throw new \Exception('Invalid playlist id.');
+        }
+
+        if(!$user_id || !is_int($user_id)){
+            throw new \Exception('Invalid user id.');
+        }
+
+        $statement = $this->dbConnection->prepare("SELECT user_id FROM playlists  WHERE id = ?");
+        $statement->bind_param("i", $playlist_id);
+
+        $statement->execute();
+        $result_set = $statement->get_result();
+
+        if (empty($result_set)) {
+            return false;
+        }
+//        var_dump($result_set->fetch_row()[0]);
+//        var_dump($user_id);
+//        die;
+        return $result_set->fetch_row()[0] == $user_id;
     }
 } 

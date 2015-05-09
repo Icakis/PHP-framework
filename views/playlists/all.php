@@ -71,7 +71,7 @@ if (count($data['playlists']) > 0) {
                     <div class="col-md-6">
                         <div class="row">
                             <h4 class="col-md-9">Title: <a
-                                    href=<?php echo DX_ROOT_URL . 'songs/index/' . $playlist['id'] ?>><?php echo $playlist['title']; ?></a>
+                                    href=<?php echo DX_ROOT_URL . 'songs/index/' . $playlist['playlist_id'] ?>><?php echo $playlist['title']; ?></a>
                             </h4>
 
                             <div class="col-md-3">

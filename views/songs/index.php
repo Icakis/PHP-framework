@@ -46,7 +46,10 @@
 </script>
 <?php
 // TODO if its users playlist show upload.php
-include_once DX_ROOT_DIR . 'views/songs/upload.php';
+if( $data['is_users_playlist']){
+    include_once DX_ROOT_DIR . 'views/songs/upload.php';
+}
+
 include_once DX_ROOT_DIR . 'views/partials/select_page_size.php';
 $data['search_placeholder']='search in songs names ...';
 include_once DX_ROOT_DIR . 'views/partials/filter_by_text.php';
