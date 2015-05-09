@@ -38,10 +38,6 @@ class SongsController extends BaseController
         parent::__construct(get_class(), $this->controllerName, '/views/' . $this->controllerName . '/');
         $this->model = new \Models\SongsModel();
 
-//        $modelsFileLocation = 'models\\' . $this->contollerName . 'Model.php';
-//        include_once $modelsFileLocation;
-//        $modelClass = '\Models\\' . ucfirst($this->contollerName) . 'Model';
-//        $this->model = new $modelClass();
     }
 
     public function index($playlist_id, $pageSize = '', $page = 1, $filter = null)
@@ -59,7 +55,7 @@ class SongsController extends BaseController
         }
 
         $this->playlist_id = $playlist_id;
-        include_once DX_ROOT_DIR. 'models/playlistsModel.php';
+        include_once DX_ROOT_DIR . 'models/playlistsModel.php';
         $playlist_model = new \Models\PlaylistsModel();
         $data['is_users_playlist'] = $playlist_model->isUserPlaylist($playlist_id, $_SESSION['user_id']);
 
@@ -91,16 +87,28 @@ class SongsController extends BaseController
             $song_title = $_POST['title'];
             $song_artist = $_POST['artist'];
             $song_album = $_POST['album'];
-            if(isset($_POST['genre_id'])){
-                $song_genre_id = $_POST['genre_id'];
-            }else{
-                $song_genre_id = '';
-            }
 
-            $song_genre_type_id = $_POST['genre_type_id'];
-
-            //TODO check file size with $_FILE
             try {
+                if (isset($_POST['genre_id']) && $_POST['genre_id']!='') {
+                    $song_genre_id = $_POST['genre_id'];
+                    if ((int)$song_genre_id === 0 || strlen((int)$song_genre_id) != strlen($song_genre_id)) {
+                        throw new \Exception('Invalid genre id.');
+                    }
+                    $song_genre_id = (int)$song_genre_id;
+                } else {
+                    $song_genre_id = null;
+                }
+
+                if (isset($_POST['genre_type_id']) && $_POST['genre_type_id']!='') {
+                    $song_genre_type_id = $_POST['genre_type_id'];
+                    if ((int)$song_genre_type_id === 0 ||strlen((int)$song_genre_type_id) != strlen($song_genre_type_id)) {
+                        throw new \Exception('Invalid genre id.');
+                    }
+                    $song_genre_type_id = (int)$song_genre_type_id;
+                } else {
+                    $song_genre_type_id = null;
+                }
+
                 $playlist_id_string = $playlist_id;
                 $playlist_id = (int)$playlist_id;
                 if ($playlist_id == 0 || strlen($playlist_id) != strlen($playlist_id_string)) {
@@ -177,6 +185,7 @@ class SongsController extends BaseController
 
                 if (move_uploaded_file($_FILES['audio-file']['tmp_name'], $uploadfile)) {
                     // echo "File is valid, and was successfully uploaded.\n";
+                    $is_now_uploaded =true;
                 } else {
                     throw new \Exception('Possible file upload attack!');
                 }
@@ -185,12 +194,22 @@ class SongsController extends BaseController
                 $this->model->addPlaylistSong($playlist_id, $user_id, $song_title, $song_artist, $file_name, $song_album, $song_genre_id, $song_genre_type_id);
                 array_push($_SESSION['messages'], new notyMessage('Successful song added.', 'success'));
             } catch (\Exception $e) {
+                if ($is_now_uploaded && isset($uploadfile) && file_exists($uploadfile)) {
+                    unlink($uploadfile);
+                }
+
                 array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
             }
+
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/');
         }
 
-        header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize.'/' );
-        // $this->index();
+        $template_file = DX_ROOT_DIR . $this->views_dir . 'upload.php';
+        include_once DX_ROOT_DIR . 'models/genresModel.php';
+        $genre_model = new \Models\GenresModel();
+
+        $data['genres'] = $genre_model->getGenres();
+        $this->renderView($template_file, $data, false);
     }
 
     public function delete($delete_playlist_id)

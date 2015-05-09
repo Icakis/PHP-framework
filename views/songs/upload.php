@@ -1,3 +1,32 @@
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '<?php echo DX_ROOT_URL ?>genres/allGenreTypes/',
+            method: 'get'
+        }).success(function (data) {
+            // console.log(data);
+            data = JSON.parse(data);
+            $('#genreSelect').change(function () {
+               // console.log($('#genreSelect').val())
+                genreTypeSelect = $('#genreTypeSelect');
+                genreTypeSelect.empty();
+                genreTypeSelect.append($('<option value="">-</option>'));
+                genre_id = $('#genreSelect').val();
+                if(genre_id){
+                    for(i in data){
+                        // console.log(data[i]);
+                        if(data[i]['genre_id']== genre_id){
+                            genreTypeSelect.append($("<option value='"+data[i]['id']+"'>"+data[i]['name']+"</option>"));
+                        }
+                    }
+                }
+            });
+        });
+    });
+
+
+</script>
+
 <div class="panel-group" id="accordion">
     <div class="panel panel-default" id="panel-upload">
         <div class="panel-heading">
@@ -9,7 +38,8 @@
         </div>
         <div id="collapseUpload" class="panel-collapse collapse">
             <div class="panel-body">
-                <form method="post" enctype="multipart/form-data" action=<?php echo DX_ROOT_URL . 'songs/upload/'. $this->playlist_id ; ?>>
+                <form method="post" enctype="multipart/form-data"
+                      action=<?php echo DX_ROOT_URL . 'songs/upload/' . $this->playlist_id; ?>>
                     <div class="row">
                         <div class="col-md-1">
                             <img id="defaultPlaylistImageId"
@@ -33,7 +63,7 @@
                                 <select name='genre_id' id="genreSelect">
                                     <option value="">-</option>
                                     <?php
-                                    foreach($data['genres'] as $genre){
+                                    foreach ($data['genres'] as $genre) {
                                         echo "<option value={$genre['id']}>{$genre['name']}</option>";
                                     }
                                     ?>
@@ -47,7 +77,7 @@
                             </div>
                             <div>
                                 <label>Max upload size is 5MB</label>
-                                <input type="hidden" name="MAX_FILE_SIZE" value=<?php echo MAX_UPLOAD_SIZE; ?> />
+                                <input type="hidden" name="MAX_FILE_SIZE" value=<?php echo MAX_UPLOAD_SIZE; ?>/>
                                 <input type="file" id="fileInput" name="audio-file" accept="audio/*">
                             </div>
                             <div id="buttonContainer">

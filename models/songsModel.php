@@ -33,7 +33,7 @@ class SongsModel extends BaseModel
             FROM songs s
             JOIN users u ON s.user_id = u.id
             LEFT JOIN genres g ON s.genre_id = g.id
-            LEFT JOIN genres_types gt ON g.id = gt.id
+            LEFT JOIN genres_types gt ON s.genre_type_id = gt.id
             JOIN playlists p ON s.playlist_id = p.id
             WHERE playlist_id = ? AND s.title LIKE CONCAT('%', ?, '%')
             LIMIT ?, ? ");
@@ -98,14 +98,10 @@ class SongsModel extends BaseModel
 
         if ($genre_id && !is_int($genre_id)) {
             throw new \Exception('Invalid genre id.');
-        }else{
-            $genre_id =null;
         }
 
-        if ($genre_type_id != null && !is_int($genre_type_id)) {
+        if ($genre_type_id && !is_int($genre_type_id)) {
             throw new \Exception('Invalid genre type id.');
-        }else{
-            $genre_type_id = null;
         }
 
         $date_added = date("c");

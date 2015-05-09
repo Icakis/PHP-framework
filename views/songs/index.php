@@ -47,7 +47,8 @@
 <?php
 // TODO if its users playlist show upload.php
 if( $data['is_users_playlist']){
-    include_once DX_ROOT_DIR . 'views/songs/upload.php';
+//    include_once DX_ROOT_DIR . 'views/songs/upload.php';
+    $this->upload($this->playlist_id );
 }
 
 include_once DX_ROOT_DIR . 'views/partials/select_page_size.php';

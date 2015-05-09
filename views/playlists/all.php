@@ -16,10 +16,7 @@
             $(el).text('Hide Comments');
         } else {
             $(el).text(defaultText);
-        }
-        ;
-
-
+        } ;
     }
 
     function addComment(el) {
@@ -41,7 +38,6 @@
         }).error(function () {
             return false
         });
-
     }
 </script>
 

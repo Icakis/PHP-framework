@@ -89,7 +89,7 @@ class GenresController extends BaseController
         $this->index();
     }
 
-    public function allGenres($pageSize = '', $page = 1)
+    public function allGenresAndTypes()
     {
         $this->genres = $this->model->getGenres();
         foreach($this->genres as  $key => $value){
@@ -99,44 +99,10 @@ class GenresController extends BaseController
        echo json_encode($this->genres);
     }
 
-    protected function generatePaging($actionName, $pageSize, $page, &$data)
+    public function allGenreTypes()
     {
-        $is_wrong_page_params = false;
-        if (!is_int($pageSize)) {
-            $pageSizeSting = $pageSize;
-            $pageSize = (int)$pageSize;
-            if ($pageSize <= 0 || $pageSize > 100 || strlen($pageSizeSting) != strlen($pageSize)) {
-                $is_wrong_page_params = true;
-            } else {
-                $this->pageSize = $pageSize;
-                $_SESSION['page_size'] = $pageSize;
-            }
-        }
+        $this->genres = $this->model->getGenreTypesGroupByGenreId();
 
-        $data['items_per_page'] = $this->pageSize;
-
-        if (!is_int($page)) {
-            $pageSting = $page;
-            $page = (int)$page;
-            if ($page <= 0 || strlen($pageSting) != strlen($page)) {
-                $page = 1;
-                $is_wrong_page_params = true;
-            }
-        }
-
-        $data['page'] = $page;
-
-        if ($is_wrong_page_params) {
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $actionName . '/' . $this->pageSize . '/1');
-            die;
-        }
-
-
-        if ((isset($_POST['items_per_page']) && ((int)$_POST['items_per_page'] !== 0))) {
-            $data['items_per_page'] = (int)$_POST['items_per_page'];
-            $this->pageSize = (int)$_POST['items_per_page'];
-            header('Location: ' . DX_ROOT_URL . $this->contollerName . '/' . $actionName . '/' . $this->pageSize . '/1');
-            die;
-        }
+        echo json_encode($this->genres);
     }
 } 

@@ -46,4 +46,21 @@ class GenresModel extends BaseModel
 
         return $results;
     }
+
+    public function getGenreTypesGroupByGenreId()
+    {
+        $statement = $this->dbConnection->prepare("SELECT * FROM genres_types ORDER BY genre_id, name");
+        $statement->execute();
+        $result_set = $statement->get_result();
+
+        $results = array();
+
+        if (!empty($result_set) && $result_set->num_rows > 0) {
+            while ($row = $result_set->fetch_assoc()) {
+                $results[] = $row;
+            }
+        }
+
+        return $results;
+    }
 } 
