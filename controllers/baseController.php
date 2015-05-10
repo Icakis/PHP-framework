@@ -1,7 +1,9 @@
 <?php
 
 namespace Controllers;
-
+include_once '/models/ranksModel.php';
+include_once '/models/genresModel.php';
+include_once '/models/playlistsModel.php';
 class BaseController
 {
     protected $layout = 'default/';
@@ -10,27 +12,32 @@ class BaseController
     protected $controller = null;
     protected $title = 'Home';
 
-    public function __construct($controllerName = '\Controllers\BaseController', $model = 'todos', $views_dir = '/views/home/')
+
+    protected $pageSize;
+    protected $controllerName = 'base';
+    protected $methodName;
+    protected $rank_model;
+
+    public function __construct($controllerName = '\Controllers\BaseController', $model = 'base', $views_dir = '/views/home/')
     {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         // Get caller classes
         $this->controller = $controllerName;
         $this->model = $model;
         $this->views_dir = $views_dir;
 
-//// 		$this_class = get_class();
-//// 		$called_class = get_called_class();
-//
-//// 		if( $this_class !== $called_class ) {
-//// 			var_dump( $called_class );
-//// 		}
-//
         include_once DX_ROOT_DIR . "models/{$model}Model.php";
         $model_class = "\Models\\" . ucfirst($model) . "Model";
 
         $this->model = new $model_class(array('table' => 'none'));
 
-//        $logged_user = \Lib\Auth::get_instance()->get_logged_user();
-//        $this->logged_user = $logged_user;
+        if (!isset($_SESSION['page_size'])) {
+            $this->pageSize = PAGE_SIZE;
+        } else {
+            $this->pageSize = $_SESSION['page_size'];
+        }
     }
 
     public function home()
@@ -46,6 +53,21 @@ class BaseController
 //        var_dump(DX_ROOT_PATH);
 //        var_dump(DX_ROOT_URL);
 
+//        include_once DX_ROOT_DIR . 'controllers/ranksController.php';
+
+        $this->rank_model = new \Models\RanksModel();
+        $this->data['top-playlists'] = $this->rank_model->highRatedPlaylists();
+
+        $this->genres_model = new \Models\GenresModel();
+        $this->genres = $this->genres_model->getGenres();
+        foreach($this->genres as  $key => $value){
+            $this->genres[$key]['genres_types']= $this->genres_model->getGenreTypesByGenreType($value['id']);
+        }
+
+        $this->playlists_model = new \Models\PlaylistsModel();
+        include_once DX_ROOT_DIR.'controllers/playlistsController.php';
+        //$c = new PlaylistsController();
+        //$c->all();
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
         // var_dump($template_file);
@@ -138,7 +160,7 @@ class BaseController
         $data['page'] = $page;
 
         if ($is_wrong_page_params) {
-            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $actionName . '/' . $this->pageSize . '/1/'.urlencode($filter));
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $actionName . '/' . $this->pageSize . '/1/' . urlencode($filter));
             die;
         }
 
@@ -146,7 +168,7 @@ class BaseController
         if ((isset($_POST['items_per_page']) && ((int)$_POST['items_per_page'] !== 0))) {
             $data['items_per_page'] = (int)$_POST['items_per_page'];
             $this->pageSize = (int)$_POST['items_per_page'];
-            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $actionName . '/' . $this->pageSize . '/1/'.urlencode($filter));
+            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $actionName . '/' . $this->pageSize . '/1/' . urlencode($filter));
             die;
         }
     }

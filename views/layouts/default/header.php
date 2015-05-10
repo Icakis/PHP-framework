@@ -28,7 +28,7 @@
         <?php
         if ($this->isAuthorize()) {
             ?>
-            <li>User: <?php echo $_SESSION['username']; ?></li>
+            <li>User: <?php echo htmlspecialchars($_SESSION['username']); ?></li>
             <li><a href=<?php echo DX_ROOT_URL . 'playlists/mine' ?>>My Playlists</a></li>
             <li><a href=<?php echo DX_ROOT_URL . 'playlists/all' ?>>Public Playlists</a></li>
             <li><a href=<?php echo DX_ROOT_URL . 'users/logout' ?>>Logout</a></li>

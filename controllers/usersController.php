@@ -6,7 +6,7 @@ use Lib\notyMessage;
 
 class UsersController extends BaseController
 {
-   // protected $layout = 'default/default.php';
+    // protected $layout = 'default/default.php';
     protected $title;
 
     public function __construct()
@@ -23,7 +23,7 @@ class UsersController extends BaseController
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
 
-        include_once DX_ROOT_DIR . '/views/layouts/' . $this->layout;
+        // include_once DX_ROOT_DIR . '/views/layouts/' . $this->layout;
     }
 
     public function register()
@@ -36,6 +36,11 @@ class UsersController extends BaseController
 
         if ($this->isPost()) {
             try {
+                if (!isset($_POST['register_token']) || $_POST['register_token'] != $_SESSION['register_token']) {
+                    array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                    die;
+                }
+
                 $this->model->createUser($_POST['username'], $_POST['pass'], $_POST['passConfirm'], $_POST['name'], $_POST['email'], $_POST['phone']);
 
                 $user_data = $this->model->loginUser($_POST['username'], $_POST['pass']);
@@ -63,6 +68,11 @@ class UsersController extends BaseController
 
         if ($this->isPost()) {
             try {
+                if (!isset($_POST['login_token']) || $_POST['login_token'] != $_SESSION['login_token']) {
+                    array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                    die;
+                }
+
                 if ($_POST['username'] == '') {
                     throw new \Exception('Username is required. Login failed.');
                 }
@@ -116,20 +126,19 @@ class UsersController extends BaseController
 
     public function show($username)
     {
-        if (!isset($username)) {
-            if ($this->isAuthorize()) {
-                header('Location: ' . DX_ROOT_URL . 'users/' . $_SESSION['username']);
-            } else {
-                header('Location: ' . DX_ROOT_URL);
-            }
 
-            die;
+        if (!$this->isAuthorize()) {
+            array_push($_SESSION['messages'], new notyMessage('Login first', 'warning'));
+            header('Location: ' . DX_ROOT_URL);
         }
+
 
         try {
             $user = $this->model->getUserByUsername($username);
             $template_file = DX_ROOT_DIR . $this->views_dir . 'show.php';
-            $this->renderView($template_file, $user);
+//            var_dump($template_file);
+            $data['user'] = $user;
+            $this->renderView($template_file, $data);
         } catch (\Exception $e) {
             array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
         }

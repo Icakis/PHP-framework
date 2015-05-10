@@ -56,9 +56,16 @@ class PlaylistcommentsController extends BaseController
 
         $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
         if (isset($_POST['search'])) {
+            if(!isset($_POST['search_token']) || $_POST['search_token'] != $_SESSION['search_token']){
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
+
             header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
             die;
         }
+
+
 
         $items_count = $this->model->getPlaylistCommentsCount($playlist_id, $filter);
         $data['items_count'] = $items_count;
@@ -79,6 +86,11 @@ class PlaylistcommentsController extends BaseController
     public function add($playlist_id)
     {
         if ($this->isPost()) {
+            if(!isset($_POST['comment_token']) || $_POST['comment_token'] != $_SESSION['comment_token']){
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
+
             $user_id = $_SESSION['user_id'];
             $comment = $_POST['text'];
 

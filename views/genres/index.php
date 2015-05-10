@@ -28,7 +28,7 @@
                                 ">
                                 <div class="panel-body">
                                     <?php foreach ($genre['genres_types'] as $type) {
-                                        echo "<a href='' class='list-group-item'>{$type['name']}</a>";
+                                        echo "<a href='' class='list-group-item'>".htmlspecialchars($type['name'])."</a>";
                                     } ?>
                                 </div>
                             </div>

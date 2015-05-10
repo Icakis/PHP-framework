@@ -4,7 +4,7 @@
             url: '<?php echo DX_ROOT_URL ?>genres/allGenreTypes/',
             method: 'get'
         }).success(function (data) {
-            // console.log(data);
+            //console.log(data);
             data = JSON.parse(data);
             $('#genreSelect').change(function () {
                // console.log($('#genreSelect').val())
@@ -26,7 +26,17 @@
 
 
 </script>
+<?php
 
+use \Lib\TokenGenerator;
+if($this->isGet()){
+    include_once 'lib/tokenGenerator.php';
+    $randnum = new TokenGenerator();
+    $randnum->getToken();
+    $_SESSION['upload_token'] = $randnum->getToken();
+}
+
+?>
 <div class="panel-group" id="accordion">
     <div class="panel panel-default" id="panel-upload">
         <div class="panel-heading">
@@ -64,7 +74,7 @@
                                     <option value="">-</option>
                                     <?php
                                     foreach ($data['genres'] as $genre) {
-                                        echo "<option value={$genre['id']}>{$genre['name']}</option>";
+                                        echo "<option value={$genre['id']}>".htmlspecialchars($genre['name'])."</option>";
                                     }
                                     ?>
                                 </select>
@@ -85,6 +95,7 @@
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" name="upload_token" value="<?php echo $_SESSION['upload_token']; ?>">
                 </form>
 
             </div>

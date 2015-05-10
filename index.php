@@ -16,7 +16,6 @@ $request_home = DX_DS . DX_ROOT_PATH;
 
 include_once 'lib/database.php';
 include_once 'lib/notyMessage.php';
-//include_once 'lib/auth.php';
 include_once 'controllers/BaseController.php';
 
 // Read the request

@@ -1,3 +1,13 @@
+<?php
+use \Lib\TokenGenerator;
+if($this->isGet()){
+    include_once 'lib/tokenGenerator.php';
+    $randnum = new TokenGenerator();
+    $randnum->getToken();
+    $_SESSION['login_token'] = $randnum->getToken();
+}
+?>
+
 <div id="loginModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -16,6 +26,7 @@
                         <input type="submit" class="btn btn-primary btn-lg btn-block" value="Sign In" />
                         <p class="btn-lg text-center"><a href=<?php echo DX_ROOT_URL . 'users/register' ?>>Register</a></p>
                     </div>
+                    <input type="hidden" name="login_token" value="<?php echo $_SESSION['login_token']; ?>">
                 </form>
             </div>
             <div class="modal-footer">

@@ -22,7 +22,8 @@
 
     function addComment(el) {
         var commentText = $($(el))[0].getElementsByTagName('textarea')[0].value;
-
+        var commentToken = $(el)[0][2].value;
+//        console.log($(el)[0][2].value);
 //        var container = $($(el).parent().attr('data-target'))[0];
 //        var playlistId = $(container).attr('data-playlist-id');
         var playlistId = $(el).parent().attr('data-playlist-id');
@@ -31,7 +32,8 @@
         $.ajax({
             url: '<?php echo DX_ROOT_URL ?>playlistcomments/add/' + playlistId,
             method: 'post',
-            data: {"text": commentText}
+            data: {"text": commentText,
+                    "comment_token": commentToken}
         }).success(function (data) {
             commentText = '';
 
@@ -44,21 +46,33 @@
     function vote(el) {
         playlist_id = $(el).data('playlist-id');
         rank_value = $(el).find('input[name="vote-value"]').val();
+        voteToken = $(el).find('input[name="vote_token"]').val();
         $.ajax({
             url: '<?php echo DX_ROOT_URL ?>ranks/rankplaylist/' + playlist_id + '/' + rank_value,
-            method: 'post'
+            method: 'post',
+            data:{
+                "vote-value":rank_value,
+                "vote_token": voteToken
+            }
         }).success(function (data) {
-           return location.reload();
-        }).error(function(e){
+            return location.reload();
+        }).error(function (e) {
             console.log(e);
         });
 
         return false;
     }
 </script>
-
 <?php
-include_once DX_ROOT_DIR . 'views/playlists/create.php';
+use \Lib\TokenGenerator;
+if($this->isGet()){
+    include_once 'lib/tokenGenerator.php';
+    $randnum = new TokenGenerator();
+    $randnum->getToken();
+    $_SESSION['vote_token'] = $randnum->getToken();
+}
+
+
 include_once DX_ROOT_DIR . 'views/partials/select_page_size.php';
 include_once DX_ROOT_DIR . 'views/partials/filter_by_text.php';
 
@@ -83,7 +97,7 @@ if (count($data['playlists']) > 0) {
                     <div class="col-md-6">
                         <div class="row">
                             <h4 class="col-md-9">Title: <a
-                                    href=<?php echo DX_ROOT_URL . 'songs/index/' . $playlist['playlist_id'] ?>><?php echo $playlist['title']; ?></a>
+                                    href=<?php echo DX_ROOT_URL . 'songs/index/' . $playlist['playlist_id'] ?>><?php echo htmlspecialchars($playlist['title']); ?></a>
                             </h4>
 
                             <div class="col-md-3">
@@ -99,7 +113,7 @@ if (count($data['playlists']) > 0) {
                         </div>
                         <div class="row">
                             <label class="col-md-12">Creator: <a
-                                    href=<?php echo DX_ROOT_URL . 'users/show/' . $playlist['username'] ?>><?php echo $playlist['username'] ?></a></label>
+                                    href=<?php echo DX_ROOT_URL . 'users/show/' . $playlist['username'] ?>><?php echo htmlspecialchars($playlist['username']); ?></a></label>
                         </div>
                         <div class="row">
                             <label class="col-md-12">Songs: <?php echo $playlist['songs_count']; ?></label>
@@ -127,7 +141,12 @@ if (count($data['playlists']) > 0) {
                                                 echo " liked";
                                             } ?>" aria-hidden="true"></span>
                                         </button>
-                                        <?php echo $playlist['likes_sum']; ?>
+                                        <input type="hidden" name="vote_token" value="<?php echo $_SESSION['vote_token']; ?>">
+                                        <?php  if ($playlist['likes_sum']) {
+                                            echo $playlist['likes_sum'];
+                                        } else {
+                                            echo '0';
+                                        }; ?>
                                     </form>
                                 </div>
                                 <div class="row">
@@ -144,7 +163,14 @@ if (count($data['playlists']) > 0) {
                                                 echo " disliked";
                                             } ?>" aria-hidden="true"></span>
                                         </button>
-                                        <?php echo $playlist['dislikes_sum']; ?>
+                                        <input type="hidden" name="vote_token" value="<?php echo $_SESSION['vote_token']; ?>">
+                                        <?php
+                                        if ($playlist['dislikes_sum']) {
+                                            echo $playlist['dislikes_sum'];
+                                        } else {
+                                            echo '0';
+                                        };
+                                        ?>
                                     </form>
                                 </div>
                             </div>

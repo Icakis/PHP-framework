@@ -43,23 +43,27 @@ class RanksController extends BaseController
 
     public function rankplaylist($playlist_id, $is_like, $pageSize = '', $page = 1, $filter = null)
     {
-        if($this->isPost()){
+        if ($this->isPost()) {
+            if(!isset($_POST['vote_token']) || $_POST['vote_token'] != $_SESSION['vote_token']){
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
             try {
                 if ($is_like != '-1' && $is_like != '1') {
 
                     throw new \Exception('Invalid vote vaule');
                 }
 
-                if (strlen((int)$playlist_id) != strlen( $playlist_id )) {
+                if (strlen((int)$playlist_id) != strlen($playlist_id)) {
 
                     throw new \Exception('Invalid playlist id');
                 }
 
 
-                $is_like = (int) $is_like;
-                if($is_like === 1){
+                $is_like = (int)$is_like;
+                if ($is_like === 1) {
                     $is_like = true;
-                }else{
+                } else {
                     $is_like = false;
                 }
 
@@ -72,10 +76,10 @@ class RanksController extends BaseController
             }
 
 
-            if($is_like){
-                $message ='Succesfully like playlist';
-            }else{
-                $message ='Succesfully dislike playlist';
+            if ($is_like) {
+                $message = 'Succesfully like playlist';
+            } else {
+                $message = 'Succesfully dislike playlist';
             }
 
             array_push($_SESSION['messages'], new notyMessage($message, 'success'));
@@ -85,9 +89,10 @@ class RanksController extends BaseController
     public function getplaylistrank($playlist_id)
     {
         if ($this->isPost()) {
-            $user_id = $_SESSION['user_id'];
+
 
             try {
+                $user_id = $_SESSION['user_id'];
                 return $this->model->getPlaylistLikesDislikes($playlist_id);
             } catch (\Exception $e) {
                 array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
@@ -95,57 +100,19 @@ class RanksController extends BaseController
         }
     }
 
-    public function delete($delete_playlist_id)
+    public function highratedplaylists($top_count = 10)
     {
         try {
-            $user_id = $_SESSION['user_id'];
-            if (!$this->model->deletePlaylist($user_id, $delete_playlist_id)) {
-                throw new \Exception('Cannot delete playlist.');
-            }
-
-            array_push($_SESSION['messages'], new notyMessage('Playlist deleted.', 'success'));
-            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/mine');
-            die;
+          $data['top-playlists']=  $this->model->highRatedPlaylists($top_count);
         } catch (\Exception $e) {
-            array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'error'));
+            array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
         }
 
-        $this->index();
+        $template_file = DX_ROOT_DIR . $this->views_dir . 'top-rated.php';
+        $this->renderView($template_file, $data, false);
     }
 
-    public function all($pageSize = '', $page = 1, $filter = null)
-    {
-        $this->methodName = __FUNCTION__;
-
-        if ($filter) {
-            $filter = urldecode($filter);
-        }
-
-        $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
-
-        if (isset($_POST['search'])) {
-            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
-            die;
-        }
-
-
-        $items_count = $this->model->getPublicPlaylistsCount($filter);
-        $data['items_count'] = $items_count;
-        $data['num_pages'] = (int)ceil($items_count / $this->pageSize);
-        $data['filter'] = $filter;
-        if ($data['page'] > $data['num_pages'] && $data['num_pages'] != 0) {
-            $data['page'] = 1;
-            header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . $filter);
-        }
-
-        $offset = $this->pageSize * ($data['page'] - 1);
-        $data['playlists'] = $this->model->getAllPublicPlaylists($offset, $this->pageSize, $filter);
-
-        $template_file = DX_ROOT_DIR . $this->views_dir . 'all.php';
-        $this->renderView($template_file, $data);
-    }
-
-    public function  isUserPlaylist($playlist_id, $user_id)
+    public function  isUserPlaylist($playlist_id)
     {
         try {
             $user_id = $_SESSION['user_id'];
@@ -154,4 +121,50 @@ class RanksController extends BaseController
             array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'error'));
         }
     }
+
+    public function ranksong($song_id, $is_like)
+    {
+        if ($this->isPost()) {
+            if(!isset($_POST['vote_song_token']) || $_POST['vote_song_token'] != $_SESSION['vote_song_token']){
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
+            try {
+                if ($is_like != '-1' && $is_like != '1') {
+
+                    throw new \Exception('Invalid vote vaule');
+                }
+
+                if (!$song_id || strlen((int)$song_id) != strlen($song_id)) {
+
+                    throw new \Exception('Invalid song id');
+                }
+
+
+                $is_like = (int)$is_like;
+                if ($is_like === 1) {
+                    $is_like = true;
+                } else {
+                    $is_like = false;
+                }
+
+                $song_id = (int)$song_id;
+
+                $this->model->rankSong($song_id, $_SESSION['user_id'], $is_like);
+            } catch (\Exception $e) {
+                array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
+                die;
+            }
+
+
+            if ($is_like) {
+                $message = 'Successfully like song.';
+            } else {
+                $message = 'Successfully dislike song.';
+            }
+
+            array_push($_SESSION['messages'], new notyMessage($message, 'success'));
+        }
+    }
+
 } 

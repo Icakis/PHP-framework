@@ -49,13 +49,18 @@ class SongcommentsController extends BaseController
 
     public function show($song_id, $pageSize = null, $page = 1, $filter = null)
     {
-        $this->methodName = __FUNCTION__.'/'.$song_id;
+        $this->methodName = __FUNCTION__ . '/' . $song_id;
         if ($filter) {
             $filter = urldecode($filter);
         }
 
         $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
         if (isset($_POST['search'])) {
+            if (!isset($_POST['search_token']) || $_POST['search_token'] != $_SESSION['search_token']) {
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
+
             header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
             die;
         }
@@ -79,21 +84,23 @@ class SongcommentsController extends BaseController
     public function add($song_id)
     {
         if ($this->isPost()) {
-            $user_id = $_SESSION['user_id'];
-            $comment = $_POST['text'];
+            if (!isset($_POST['song_comment_token']) || $_POST['song_comment_token'] != $_SESSION['song_comment_token']) {
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
 
             try {
+                $user_id = $_SESSION['user_id'];
+                $comment = $_POST['text'];
                 $song_id = (int)$song_id;
                 $this->model->addSongComment($song_id, $user_id, $comment);
                 array_push($_SESSION['messages'], new notyMessage('Successful comment added.', 'success'));
-                header('Location: ' . DX_ROOT_URL . $this->controllerName . '/songs/' . $this->pageSize . '/1');
+//                header('Location: ' . DX_ROOT_URL . '/songs/' . $this->pageSize . '/1');
                 die;
             } catch (\Exception $e) {
                 array_push($_SESSION['messages'], new notyMessage($e->getMessage(), 'warning'));
             }
         }
-
-//        $this->index();
     }
 
     public function delete($delete_playlist_id)

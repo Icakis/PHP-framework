@@ -55,6 +55,10 @@ class PlaylistsController extends BaseController
 
         $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
         if (isset($_POST['search'])) {
+            if(!isset($_POST['search_token']) || $_POST['search_token'] != $_SESSION['search_token']){
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
             header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
             die;
         }
@@ -82,6 +86,11 @@ class PlaylistsController extends BaseController
     public function add()
     {
         if ($this->isPost()) {
+            if(!isset($_POST['create_playlist_token']) || $_POST['create_playlist_token'] != $_SESSION['create_playlist_token']){
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
+
             $user_id = $_SESSION['user_id'];
             $playlist_title = $_POST['title'];
             $playlist_description = $_POST['description'];

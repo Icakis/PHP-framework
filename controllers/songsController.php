@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Lib\notyMessage;
 use \Models\PlaylistsModel;
+include_once '/models/ranksModel.php';
 
 class SongsController extends BaseController
 {
@@ -16,7 +17,7 @@ class SongsController extends BaseController
     protected $controllerName = 'songs';
     protected $methodName;
     protected $playlist_id;
-
+    protected $rank_model;
     public function __construct()
     {
         if (!$this->isAuthorize()) {
@@ -37,7 +38,7 @@ class SongsController extends BaseController
 
         parent::__construct(get_class(), $this->controllerName, '/views/' . $this->controllerName . '/');
         $this->model = new \Models\SongsModel();
-
+        $this->rank_model = new \Models\RanksModel();
     }
 
     public function index($playlist_id, $pageSize = '', $page = 1, $filter = null)
@@ -61,6 +62,11 @@ class SongsController extends BaseController
 
         $this->generatePaging($this->methodName, $pageSize, $page, $data, $filter);
         if (isset($_POST['search'])) {
+            if(!isset($_POST['search_token']) || $_POST['search_token'] != $_SESSION['search_token']){
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
+
             header('Location: ' . DX_ROOT_URL . $this->controllerName . '/' . $this->methodName . '/' . $this->pageSize . '/1/' . urlencode($_POST['search']));
             die;
         }
@@ -74,7 +80,16 @@ class SongsController extends BaseController
 
         $offset = $this->pageSize * ($data['page'] - 1);
         $data['songs'] = $this->model->getPlaylistSongs($playlist_id, $offset, $this->pageSize, $filter);
+        foreach ($data['songs'] as $k=>$v) {
+            $data['songs'][ $k]['rank_stats'] = $this->rank_model->isSongLikedByUser($v['song_id'], $_SESSION['user_id']);
+        }
 
+        include_once DX_ROOT_DIR . 'models/genresModel.php';
+        $genre_model = new \Models\GenresModel();
+
+        $data['genres'] = $genre_model->getGenres();
+//        var_dump($data['songs']);
+//        die;
         $template_file = DX_ROOT_DIR . $this->views_dir . 'index.php';
         $this->renderView($template_file, $data);
     }
@@ -83,6 +98,11 @@ class SongsController extends BaseController
     {
         $this->methodName = 'index/' . $playlist_id;
         if ($this->isPost()) {
+            if(!isset($_POST['upload_token']) || $_POST['upload_token'] != $_SESSION['upload_token']){
+                array_push($_SESSION['messages'], new notyMessage('Possible CSRF...', 'alert'));
+                die;
+            }
+
             $user_id = $_SESSION['user_id'];
             $song_title = $_POST['title'];
             $song_artist = $_POST['artist'];
@@ -209,6 +229,7 @@ class SongsController extends BaseController
         $genre_model = new \Models\GenresModel();
 
         $data['genres'] = $genre_model->getGenres();
+//        var_dump($data['genres']);
         $this->renderView($template_file, $data, false);
     }
 
@@ -246,6 +267,7 @@ class SongsController extends BaseController
         }
 
         $template_file = DX_ROOT_DIR . $this->views_dir . 'all.php';
+
         $this->renderView($template_file, $data);
     }
 

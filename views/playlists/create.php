@@ -1,3 +1,14 @@
+<?php
+use \Lib\TokenGenerator;
+
+if($this->isGet()){
+    include_once 'lib/tokenGenerator.php';
+    $randnum = new TokenGenerator();
+    $randnum->getToken();
+    $_SESSION['create_playlist_token'] = $randnum->getToken();
+}
+
+?>
 <div class="panel-group" id="accordion">
     <div class="panel panel-default" id="panel1">
         <div class="panel-heading">
@@ -33,6 +44,7 @@
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" name="create_playlist_token" value="<?php echo $_SESSION['create_playlist_token']; ?>">
                 </form>
             </div>
         </div>

@@ -3,38 +3,20 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="text-center">User profile</h1>
-                <?php var_dump($data); ?>
             </div>
             <div class="modal-body">
                 <div class="form col-md-12 center-block" name="registerForm">
                     <div class="form-group">
-                        <input name="username" type="text" class="form-control input-lg" placeholder="Username">
+                        <label>Username: <?php echo htmlspecialchars($data['user']['username']); ?></label>
                     </div>
                     <div class="form-group">
-                        <input name="pass" type="password" class="form-control input-lg" placeholder="Password"
-                               required="required" pattern=".{2,100}"
-                               title="Password length should be inclusive between 2 and 100.">
+                        <label>Name: <?php echo htmlspecialchars($data['user']['name']); ?></label>
                     </div>
                     <div class="form-group">
-                        <input name="passConfirm" type="password" class="form-control input-lg"
-                               placeholder="Confirm password" required="required" pattern=".{2,100}"
-                               title="Password length should be inclusive between 2 and 100.">
+                        <label>Email: <a href="<?php echo 'mailto:'.$data['user']['email'];?>"><?php echo htmlspecialchars($data['user']['email']); ?></a></label>
                     </div>
                     <div class="form-group">
-                        <input name="name" type="text" class="form-control input-lg" placeholder="Name"
-                               required="required">
-                    </div>
-                    <div class="form-group">
-                        <input name="email" type="email" class="form-control input-lg" placeholder="Email"
-                               required="required">
-                    </div>
-                    <div class="form-group">
-                        <input name="phone" type="tel" class="form-control input-lg" placeholder="Phone">
-                    </div>
-                    <div class="form-group text-center">
-                        <input type="submit" class="btn btn-primary btn-lg btn-block" value="Register"/>
-
-                        <p class="btn-lg text-center"><a href=<?php echo DX_ROOT_URL . 'users/login' ?>>Login</a></p>
+                        <label>Phone: <?php echo htmlspecialchars($data['user']['phone']); ?></label>
                     </div>
                 </div>
             </div>

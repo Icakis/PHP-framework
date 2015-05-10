@@ -12,32 +12,43 @@ class SongsModel extends BaseModel
         parent::__construct($args);
     }
 
-    public function getPlaylistSongs($playlist_id, $offset, $playlists_count, $filter = null)
+    public function getPlaylistSongs($playlist_id, $offset, $songs_count, $filter = null)
     {
         $statement = $this->dbConnection->prepare(
             "SELECT s.id AS song_id,
                     s.title AS song_title,
                     s.artist AS song_artist,
                     s.album AS song_album,
+                    s.user_id AS user_id,
+                    s.date_added,
+                    s.playlist_id,
+                    s.file_name,
+                    s.duration,
                     g.name AS genre_name,
                     gt.name AS genre_type_name,
-                    s.user_id AS user_id,
                     u.username AS username,
-                    s.date_added,
-                    s.likes,
-                    s.dislikes,
-                    s.playlist_id,
                     p.title AS playlist_title,
-                    s.file_name,
-                    s.duration
+                    likes_info.likes_sum AS likes_sum,
+                    likes_info.dislikes_sum AS dislikes_sum
             FROM songs s
-            JOIN users u ON s.user_id = u.id
-            LEFT JOIN genres g ON s.genre_id = g.id
-            LEFT JOIN genres_types gt ON s.genre_type_id = gt.id
-            JOIN playlists p ON s.playlist_id = p.id
+            JOIN users u
+              ON s.user_id = u.id
+            LEFT JOIN (SELECT
+						song_id as pid,
+                        SUM(is_like) AS likes_sum,
+                        SUM(is_dislike) AS dislikes_sum
+                    FROM users_songs_ranks
+                    GROUP BY song_id) likes_info
+                ON  likes_info.pid = s.id
+            LEFT JOIN genres g
+              ON s.genre_id = g.id
+            LEFT JOIN genres_types gt
+              ON s.genre_type_id = gt.id
+            LEFT JOIN playlists p
+              ON s.playlist_id = p.id
             WHERE playlist_id = ? AND s.title LIKE CONCAT('%', ?, '%')
-            LIMIT ?, ? ");
-        $statement->bind_param("isii", $playlist_id, $filter, $offset, $playlists_count);
+            LIMIT ?, ?");
+        $statement->bind_param("isii", $playlist_id, $filter, $offset, $songs_count);
 
         $statement->execute();
         $result_set = $statement->get_result();
